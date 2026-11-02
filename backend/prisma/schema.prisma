@@ -1,0 +1,91 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum MediaType {
+  MOVIE
+  TV_SHOW
+}
+
+enum WatchStatus {
+  PLAN_TO_WATCH
+  WATCHING
+  COMPLETED
+  DROPPED
+}
+
+enum GroupRole {
+  ADMIN
+  MEMBER
+}
+
+// =========================================================================
+// MODULE 1: KRISH (Auth, Taste Preferences, Watchlist & Episode Tracking)
+// =========================================================================
+
+model User {
+  id                String                @id @default(uuid())
+  name              String
+  username          String                @unique
+  email             String                @unique
+  passwordHash      String
+  subscribedOTTs    String[]
+  totalWatchMinutes Int                   @default(0)
+  createdAt         DateTime              @default(now())
+
+  genrePreferences  UserGenrePreference[]
+  watchlist         WatchlistEntry[]
+  episodeLogs       EpisodeProgress[]
+  reviews           UserReview[]
+  recLogs           RecommendationLog[]
+  groupMemberships  GroupMember[]
+  addedGroupItems   GroupWatchlistItem[]
+  pollVotes         GroupPollVote[]
+
+  @@index([username, email])
+}
+
+model UserGenrePreference {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  genre       String
+  weightScore Int      @default(5)
+
+  @@unique([userId, genre])
+  @@index([genre, weightScore])
+}
+
+model WatchlistEntry {
+  id              String      @id @default(uuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaId         String
+  media           MediaItem   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  status          WatchStatus @default(PLAN_TO_WATCH)
+  watchedEpisodes Int         @default(0)
+  personalNotes   String?
+  updatedAt       DateTime    @updatedAt
+
+  @@unique([userId, mediaId])
+  @@index([userId, status])
+}
+
+model EpisodeProgress {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaId       String
+  media         MediaItem @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  seasonNumber  Int
+  episodeNumber Int
+  watchedAt     DateTime  @default(now())
+
+  @@unique([userId, mediaId, seasonNumber, episodeNumber])
+  @@index([userId, mediaId])
+}
