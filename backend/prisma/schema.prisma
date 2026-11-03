@@ -89,3 +89,67 @@ model EpisodeProgress {
   @@unique([userId, mediaId, seasonNumber, episodeNumber])
   @@index([userId, mediaId])
 }
+
+
+
+
+
+
+
+// =========================================================================
+// MODULE 3: ARYAN (Friend Groups, Shared Watchlists & Group Watch Polls)
+// =========================================================================
+
+model FriendGroup {
+  id          String               @id @default(uuid())
+  name        String
+  inviteCode  String               @unique
+  description String?
+  createdAt   DateTime             @default(now())
+
+  members     GroupMember[]
+  sharedList  GroupWatchlistItem[]
+}
+
+model GroupMember {
+  id        String      @id @default(uuid())
+  groupId   String
+  group     FriendGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      GroupRole   @default(MEMBER)
+  joinedAt  DateTime    @default(now())
+
+  @@unique([groupId, userId])
+  @@index([userId])
+}
+
+model GroupWatchlistItem {
+  id          String          @id @default(uuid())
+  groupId     String
+  group       FriendGroup     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  mediaId     String
+  media       MediaItem       @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  addedById   String
+  addedBy     User            @relation(fields: [addedById], references: [id])
+  pitchNote   String?
+  status      String          @default("NOMINATED")
+  voteCount   Int             @default(0)
+  createdAt   DateTime        @default(now())
+
+  votes       GroupPollVote[]
+
+  @@unique([groupId, mediaId])
+  @@index([groupId, status, voteCount])
+}
+
+model GroupPollVote {
+  id          String             @id @default(uuid())
+  groupItemId String
+  groupItem   GroupWatchlistItem @relation(fields: [groupItemId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votedAt     DateTime           @default(now())
+
+  @@unique([groupItemId, userId])
+}
