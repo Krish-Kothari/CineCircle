@@ -6,6 +6,7 @@ import LoginScreen from '../screens/LoginScreen';
 import DiscoverScreen from '../screens/DiscoverScreen';
 import WatchlistScreen from '../screens/WatchlistScreen';
 import SquadsScreen from '../screens/SquadsScreen';
+import ProfileStatsScreen from '../screens/ProfileStatsScreen';
 
 export default function RootNavigator() {
   const { user, logout } = useAuth();
@@ -28,13 +29,15 @@ export default function RootNavigator() {
         {activeTab === 'DISCOVER' && <DiscoverScreen />}
         {activeTab === 'WATCHLIST' && <WatchlistScreen />}
         {activeTab === 'SQUADS' && <SquadsScreen />}
+        {activeTab === 'PROFILE' && <ProfileStatsScreen />}
       </View>
 
       <View style={styles.bottomNav}>
         {[
           { id: 'DISCOVER', label: 'Discover' },
           { id: 'WATCHLIST', label: 'Watchlist' },
-          { id: 'SQUADS', label: 'Squad Blend' }
+          { id: 'SQUADS', label: 'Squads' },
+          { id: 'PROFILE', label: 'Profile' }
         ].map((tab) => (
           <TouchableOpacity
             key={tab.id}
