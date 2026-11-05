@@ -1,5 +1,6 @@
 const express = require('express');
 const { authenticateToken } = require('../../middlewares/auth.middleware');
+const { createRateLimiter } = require('../../middlewares/rateLimiter');
 const {
   register,
   login,
@@ -16,9 +17,10 @@ const {
 } = require('./watchlist.controller');
 
 const router = express.Router();
+const authLimiter = createRateLimiter({ windowMs: 60 * 1000, maxRequests: 20 });
 
-router.post('/auth/register', register);
-router.post('/auth/login', login);
+router.post('/auth/register', authLimiter, register);
+router.post('/auth/login', authLimiter, login);
 router.get('/users/profile', authenticateToken, getMyProfile);
 router.put('/preferences/genres', authenticateToken, updatePreferences);
 router.post('/watchlist/upsert', authenticateToken, handleUpsertWatchlist);
