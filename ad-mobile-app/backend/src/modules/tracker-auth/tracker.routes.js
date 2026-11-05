@@ -13,6 +13,7 @@ const {
   handleLogEpisode,
   handleCompleteMedia,
   handleGetWatchStats,
+  handleExportWatchlist,
   handleRemoveFromWatchlist
 } = require('./watchlist.controller');
 
@@ -25,6 +26,7 @@ router.get('/users/profile', authenticateToken, getMyProfile);
 router.put('/preferences/genres', authenticateToken, updatePreferences);
 router.post('/watchlist/upsert', authenticateToken, handleUpsertWatchlist);
 router.get('/watchlist/my-list', authenticateToken, handleGetMyWatchlist);
+router.get('/watchlist/export', authenticateToken, handleExportWatchlist);
 router.post('/watchlist/log-episode', authenticateToken, handleLogEpisode);
 router.post('/watchlist/complete-media', authenticateToken, handleCompleteMedia);
 router.get('/watchlist/stats', authenticateToken, handleGetWatchStats);

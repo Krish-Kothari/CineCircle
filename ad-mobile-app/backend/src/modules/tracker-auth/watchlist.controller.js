@@ -11,6 +11,7 @@ const { markMediaCompletedTransactional } = require('./tracker.transaction');
 const { getUserWatchAnalyticsSql } = require('./analytics.sql');
 const { getUserWatchSummaryFromSql } = require('./views.sql');
 const { getWeeklyWatchVelocitySql } = require('./streak.sql');
+const { exportUserWatchlistData } = require('./export.service');
 
 const handleUpsertWatchlist = asyncHandler(async (req, res) => {
   const validationError = validateWatchlistUpsert(req.body);
@@ -55,6 +56,12 @@ const handleGetWatchStats = asyncHandler(async (req, res) => {
   );
 });
 
+const handleExportWatchlist = asyncHandler(async (req, res) => {
+  const format = req.query.format || 'json';
+  const exported = await exportUserWatchlistData(req.user.id, format);
+  return sendSuccess(res, exported, `Exported watchlist in ${format.toUpperCase()} format`);
+});
+
 const handleRemoveFromWatchlist = asyncHandler(async (req, res) => {
   await removeWatchlistItem(req.user.id, req.params.mediaId);
   return sendSuccess(res, { mediaId: req.params.mediaId }, 'Removed title from watchlist');
@@ -66,5 +73,6 @@ module.exports = {
   handleLogEpisode,
   handleCompleteMedia,
   handleGetWatchStats,
+  handleExportWatchlist,
   handleRemoveFromWatchlist
 };
