@@ -10,6 +10,7 @@ const {
 const { markMediaCompletedTransactional } = require('./tracker.transaction');
 const { getUserWatchAnalyticsSql } = require('./analytics.sql');
 const { getUserWatchSummaryFromSql } = require('./views.sql');
+const { getWeeklyWatchVelocitySql } = require('./streak.sql');
 
 const handleUpsertWatchlist = asyncHandler(async (req, res) => {
   const validationError = validateWatchlistUpsert(req.body);
@@ -42,11 +43,16 @@ const handleCompleteMedia = asyncHandler(async (req, res) => {
 });
 
 const handleGetWatchStats = asyncHandler(async (req, res) => {
-  const [stats, summaryView] = await Promise.all([
+  const [stats, summaryView, weeklyVelocity] = await Promise.all([
     getUserWatchAnalyticsSql(req.user.id),
-    getUserWatchSummaryFromSql(req.user.id)
+    getUserWatchSummaryFromSql(req.user.id),
+    getWeeklyWatchVelocitySql(req.user.id)
   ]);
-  return sendSuccess(res, { ...stats, summaryView }, 'Fetched SQL watch-time and genre analytics');
+  return sendSuccess(
+    res,
+    { ...stats, summaryView, weeklyVelocity },
+    'Fetched SQL watch-time, genre breakdown, and weekly velocity analytics'
+  );
 });
 
 const handleRemoveFromWatchlist = asyncHandler(async (req, res) => {
