@@ -12,6 +12,7 @@ const { getUserWatchAnalyticsSql } = require('./analytics.sql');
 const { getUserWatchSummaryFromSql } = require('./views.sql');
 const { getWeeklyWatchVelocitySql } = require('./streak.sql');
 const { exportUserWatchlistData } = require('./export.service');
+const { getContinueWatchingSql } = require('./binge.sql');
 
 const handleUpsertWatchlist = asyncHandler(async (req, res) => {
   const validationError = validateWatchlistUpsert(req.body);
@@ -26,6 +27,11 @@ const handleUpsertWatchlist = asyncHandler(async (req, res) => {
 const handleGetMyWatchlist = asyncHandler(async (req, res) => {
   const list = await getUserWatchlist(req.user.id, req.query.status);
   return sendSuccess(res, list, 'Fetched user watchlist');
+});
+
+const handleGetContinueWatching = asyncHandler(async (req, res) => {
+  const queue = await getContinueWatchingSql(req.user.id);
+  return sendSuccess(res, queue, 'Fetched Continue Watching queue with remaining minutes');
 });
 
 const handleLogEpisode = asyncHandler(async (req, res) => {
@@ -44,15 +50,16 @@ const handleCompleteMedia = asyncHandler(async (req, res) => {
 });
 
 const handleGetWatchStats = asyncHandler(async (req, res) => {
-  const [stats, summaryView, weeklyVelocity] = await Promise.all([
+  const [stats, summaryView, weeklyVelocity, continueWatching] = await Promise.all([
     getUserWatchAnalyticsSql(req.user.id),
     getUserWatchSummaryFromSql(req.user.id),
-    getWeeklyWatchVelocitySql(req.user.id)
+    getWeeklyWatchVelocitySql(req.user.id),
+    getContinueWatchingSql(req.user.id)
   ]);
   return sendSuccess(
     res,
-    { ...stats, summaryView, weeklyVelocity },
-    'Fetched SQL watch-time, genre breakdown, and weekly velocity analytics'
+    { ...stats, summaryView, weeklyVelocity, continueWatching },
+    'Fetched SQL watch-time, genre breakdown, and binge queue analytics'
   );
 });
 
@@ -70,6 +77,7 @@ const handleRemoveFromWatchlist = asyncHandler(async (req, res) => {
 module.exports = {
   handleUpsertWatchlist,
   handleGetMyWatchlist,
+  handleGetContinueWatching,
   handleLogEpisode,
   handleCompleteMedia,
   handleGetWatchStats,
