@@ -13,6 +13,8 @@ const { getUserWatchSummaryFromSql } = require('./views.sql');
 const { getWeeklyWatchVelocitySql } = require('./streak.sql');
 const { exportUserWatchlistData } = require('./export.service');
 const { getContinueWatchingSql } = require('./binge.sql');
+const { getUserMilestonesSql } = require('./milestone.sql');
+const { getBingePacingEstimatesSql } = require('./pacing.sql');
 
 const handleUpsertWatchlist = asyncHandler(async (req, res) => {
   const validationError = validateWatchlistUpsert(req.body);
@@ -34,6 +36,11 @@ const handleGetContinueWatching = asyncHandler(async (req, res) => {
   return sendSuccess(res, queue, 'Fetched Continue Watching queue with remaining minutes');
 });
 
+const handleGetBingePacing = asyncHandler(async (req, res) => {
+  const pacing = await getBingePacingEstimatesSql(req.user.id);
+  return sendSuccess(res, pacing, 'Calculated show completion pacing and target finish dates');
+});
+
 const handleLogEpisode = asyncHandler(async (req, res) => {
   const result = await logEpisodeWatched(req.user.id, req.body);
   return sendSuccess(res, result, 'Episode progress logged', 201);
@@ -50,16 +57,18 @@ const handleCompleteMedia = asyncHandler(async (req, res) => {
 });
 
 const handleGetWatchStats = asyncHandler(async (req, res) => {
-  const [stats, summaryView, weeklyVelocity, continueWatching] = await Promise.all([
+  const [stats, summaryView, weeklyVelocity, continueWatching, milestones, pacing] = await Promise.all([
     getUserWatchAnalyticsSql(req.user.id),
     getUserWatchSummaryFromSql(req.user.id),
     getWeeklyWatchVelocitySql(req.user.id),
-    getContinueWatchingSql(req.user.id)
+    getContinueWatchingSql(req.user.id),
+    getUserMilestonesSql(req.user.id),
+    getBingePacingEstimatesSql(req.user.id)
   ]);
   return sendSuccess(
     res,
-    { ...stats, summaryView, weeklyVelocity, continueWatching },
-    'Fetched SQL watch-time, genre breakdown, and binge queue analytics'
+    { ...stats, summaryView, weeklyVelocity, continueWatching, milestones, pacing },
+    'Fetched SQL watch-time, genre breakdown, milestones, and binge pacing analytics'
   );
 });
 
@@ -78,6 +87,7 @@ module.exports = {
   handleUpsertWatchlist,
   handleGetMyWatchlist,
   handleGetContinueWatching,
+  handleGetBingePacing,
   handleLogEpisode,
   handleCompleteMedia,
   handleGetWatchStats,

@@ -11,6 +11,7 @@ const {
   handleUpsertWatchlist,
   handleGetMyWatchlist,
   handleGetContinueWatching,
+  handleGetBingePacing,
   handleLogEpisode,
   handleCompleteMedia,
   handleGetWatchStats,
@@ -28,6 +29,7 @@ router.put('/preferences/genres', authenticateToken, updatePreferences);
 router.post('/watchlist/upsert', authenticateToken, handleUpsertWatchlist);
 router.get('/watchlist/my-list', authenticateToken, handleGetMyWatchlist);
 router.get('/watchlist/continue-watching', authenticateToken, handleGetContinueWatching);
+router.get('/watchlist/pacing', authenticateToken, handleGetBingePacing);
 router.get('/watchlist/export', authenticateToken, handleExportWatchlist);
 router.post('/watchlist/log-episode', authenticateToken, handleLogEpisode);
 router.post('/watchlist/complete-media', authenticateToken, handleCompleteMedia);
