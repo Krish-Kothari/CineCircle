@@ -5,6 +5,7 @@ const {
   register,
   login,
   getMyProfile,
+  handleUpdateProfile,
   updatePreferences
 } = require('./auth.controller');
 const {
@@ -25,6 +26,7 @@ const authLimiter = createRateLimiter({ windowMs: 60 * 1000, maxRequests: 20 });
 router.post('/auth/register', authLimiter, register);
 router.post('/auth/login', authLimiter, login);
 router.get('/users/profile', authenticateToken, getMyProfile);
+router.patch('/users/profile', authenticateToken, handleUpdateProfile);
 router.put('/preferences/genres', authenticateToken, updatePreferences);
 router.post('/watchlist/upsert', authenticateToken, handleUpsertWatchlist);
 router.get('/watchlist/my-list', authenticateToken, handleGetMyWatchlist);
