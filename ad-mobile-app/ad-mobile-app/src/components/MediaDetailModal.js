@@ -11,12 +11,28 @@ import {
 import { COLORS } from '../constants/theme';
 import apiClient from '../services/apiClient';
 
+const WATCH_STATUSES = ['PLAN_TO_WATCH', 'WATCHING', 'COMPLETED', 'DROPPED'];
+
 export default function MediaDetailModal({ visible, media, onClose }) {
   const [rating, setRating] = useState('9');
   const [reviewText, setReviewText] = useState('');
+  const [currentStatus, setCurrentStatus] = useState('PLAN_TO_WATCH');
   const [feedback, setFeedback] = useState('');
 
   if (!media) return null;
+
+  async function handleStatusChange(status) {
+    try {
+      await apiClient.post('/tracker/watchlist/upsert', {
+        mediaId: media.id,
+        status
+      });
+      setCurrentStatus(status);
+      setFeedback(`Watchlist updated to ${status}`);
+    } catch {
+      setFeedback('Failed to update status');
+    }
+  }
 
   async function handleSubmitRating() {
     try {
@@ -53,6 +69,21 @@ export default function MediaDetailModal({ visible, media, onClose }) {
             {media.type} • {media.releaseYear} • ★ {media.avgRating}
           </Text>
           <Text style={styles.synopsis}>{media.synopsis}</Text>
+
+          <Text style={styles.sectionTitle}>Set Watch Status</Text>
+          <View style={styles.statusRow}>
+            {WATCH_STATUSES.map((st) => (
+              <TouchableOpacity
+                key={st}
+                style={[styles.statusBtn, currentStatus === st && styles.statusBtnActive]}
+                onPress={() => handleStatusChange(st)}
+              >
+                <Text style={[styles.statusText, currentStatus === st && styles.statusTextActive]}>
+                  {st.replace(/_/g, ' ')}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
           <Text style={styles.sectionTitle}>Stream Now</Text>
           <View style={styles.ottRow}>
@@ -116,26 +147,38 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 20, fontWeight: 'bold', color: COLORS.textPrimary },
   closeBtn: { color: COLORS.textSecondary, fontSize: 14, fontWeight: 'bold' },
-  meta: { color: COLORS.accent, fontSize: 13, marginTop: 4, marginBottom: 10 },
-  synopsis: { color: COLORS.textSecondary, fontSize: 13, lineHeight: 19, marginBottom: 14 },
-  sectionTitle: { color: COLORS.textPrimary, fontWeight: 'bold', fontSize: 14, marginBottom: 8 },
-  ottRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
+  meta: { color: COLORS.accent, fontSize: 13, marginTop: 4, marginBottom: 8 },
+  synopsis: { color: COLORS.textSecondary, fontSize: 12, lineHeight: 18, marginBottom: 12 },
+  sectionTitle: { color: COLORS.textPrimary, fontWeight: 'bold', fontSize: 13, marginBottom: 8, marginTop: 4 },
+  statusRow: { flexDirection: 'row', gap: 6, marginBottom: 12, flexWrap: 'wrap' },
+  statusBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.background
+  },
+  statusBtnActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  statusText: { color: COLORS.textSecondary, fontSize: 11, fontWeight: '600' },
+  statusTextActive: { color: '#FFFFFF' },
+  ottRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 },
   ottBtn: {
     backgroundColor: COLORS.background,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.accent
   },
-  ottBtnText: { color: COLORS.accent, fontSize: 12, fontWeight: '600' },
+  ottBtnText: { color: COLORS.accent, fontSize: 11, fontWeight: '600' },
   rateRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   rateInput: {
-    width: 48,
+    width: 44,
     backgroundColor: COLORS.background,
     color: COLORS.warning,
     textAlign: 'center',
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderRadius: 8,
     fontWeight: 'bold',
     borderWidth: 1,
@@ -146,17 +189,17 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     color: COLORS.textPrimary,
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.border
   },
   submitBtn: {
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 14,
-    paddingVertical: 11,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
     borderRadius: 8
   },
-  submitBtnText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 13 },
+  submitBtnText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 12 },
   feedback: { color: COLORS.success, fontSize: 12, marginTop: 10 }
 });
