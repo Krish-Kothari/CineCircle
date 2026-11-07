@@ -4,9 +4,11 @@ import { COLORS } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import LoginScreen from '../screens/LoginScreen';
 import DiscoverScreen from '../screens/DiscoverScreen';
+import SearchScreen from '../screens/SearchScreen';
 import WatchlistScreen from '../screens/WatchlistScreen';
 import SquadsScreen from '../screens/SquadsScreen';
 import ProfileStatsScreen from '../screens/ProfileStatsScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 
 export default function RootNavigator() {
   const { user, logout } = useAuth();
@@ -27,17 +29,21 @@ export default function RootNavigator() {
 
       <View style={styles.screenArea}>
         {activeTab === 'DISCOVER' && <DiscoverScreen />}
+        {activeTab === 'SEARCH' && <SearchScreen />}
         {activeTab === 'WATCHLIST' && <WatchlistScreen />}
         {activeTab === 'SQUADS' && <SquadsScreen />}
         {activeTab === 'PROFILE' && <ProfileStatsScreen />}
+        {activeTab === 'SETTINGS' && <SettingsScreen />}
       </View>
 
       <View style={styles.bottomNav}>
         {[
-          { id: 'DISCOVER', label: 'Discover' },
+          { id: 'DISCOVER', label: 'Feed' },
+          { id: 'SEARCH', label: 'Search' },
           { id: 'WATCHLIST', label: 'Watchlist' },
           { id: 'SQUADS', label: 'Squads' },
-          { id: 'PROFILE', label: 'Profile' }
+          { id: 'PROFILE', label: 'Stats' },
+          { id: 'SETTINGS', label: 'Settings' }
         ].map((tab) => (
           <TouchableOpacity
             key={tab.id}
@@ -78,9 +84,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
-    paddingVertical: 12
+    paddingVertical: 10
   },
   navItem: { flex: 1, alignItems: 'center' },
-  navLabel: { fontSize: 13, color: COLORS.textSecondary, fontWeight: '600' },
+  navLabel: { fontSize: 11, color: COLORS.textSecondary, fontWeight: '600' },
   navLabelActive: { color: COLORS.primary, fontWeight: 'bold' }
 });
