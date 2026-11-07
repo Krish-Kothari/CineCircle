@@ -15,6 +15,7 @@ const { exportUserWatchlistData } = require('./export.service');
 const { getContinueWatchingSql } = require('./binge.sql');
 const { getUserMilestonesSql } = require('./milestone.sql');
 const { getBingePacingEstimatesSql } = require('./pacing.sql');
+const { getStalledWatchlistAlertsSql } = require('./churn.sql');
 
 const handleUpsertWatchlist = asyncHandler(async (req, res) => {
   const validationError = validateWatchlistUpsert(req.body);
@@ -41,6 +42,11 @@ const handleGetBingePacing = asyncHandler(async (req, res) => {
   return sendSuccess(res, pacing, 'Calculated show completion pacing and target finish dates');
 });
 
+const handleGetStalledAlerts = asyncHandler(async (req, res) => {
+  const alerts = await getStalledWatchlistAlertsSql(req.user.id);
+  return sendSuccess(res, alerts, 'Fetched stalled binge and dormant watchlist risk alerts');
+});
+
 const handleLogEpisode = asyncHandler(async (req, res) => {
   const result = await logEpisodeWatched(req.user.id, req.body);
   return sendSuccess(res, result, 'Episode progress logged', 201);
@@ -57,18 +63,19 @@ const handleCompleteMedia = asyncHandler(async (req, res) => {
 });
 
 const handleGetWatchStats = asyncHandler(async (req, res) => {
-  const [stats, summaryView, weeklyVelocity, continueWatching, milestones, pacing] = await Promise.all([
+  const [stats, summaryView, weeklyVelocity, continueWatching, milestones, pacing, stalled] = await Promise.all([
     getUserWatchAnalyticsSql(req.user.id),
     getUserWatchSummaryFromSql(req.user.id),
     getWeeklyWatchVelocitySql(req.user.id),
     getContinueWatchingSql(req.user.id),
     getUserMilestonesSql(req.user.id),
-    getBingePacingEstimatesSql(req.user.id)
+    getBingePacingEstimatesSql(req.user.id),
+    getStalledWatchlistAlertsSql(req.user.id)
   ]);
   return sendSuccess(
     res,
-    { ...stats, summaryView, weeklyVelocity, continueWatching, milestones, pacing },
-    'Fetched SQL watch-time, genre breakdown, milestones, and binge pacing analytics'
+    { ...stats, summaryView, weeklyVelocity, continueWatching, milestones, pacing, stalled },
+    'Fetched comprehensive SQL watch-time, churn risk, and velocity analytics'
   );
 });
 
@@ -88,6 +95,7 @@ module.exports = {
   handleGetMyWatchlist,
   handleGetContinueWatching,
   handleGetBingePacing,
+  handleGetStalledAlerts,
   handleLogEpisode,
   handleCompleteMedia,
   handleGetWatchStats,
