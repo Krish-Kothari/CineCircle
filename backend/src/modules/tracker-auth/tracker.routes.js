@@ -14,6 +14,7 @@ const {
   handleGetContinueWatching,
   handleGetBingePacing,
   handleGetStalledAlerts,
+  handleGetDeadlineFeasibility,
   handleGetMonthlyWrapped,
   handleLogEpisode,
   handleCompleteMedia,
@@ -35,6 +36,7 @@ router.get('/watchlist/my-list', authenticateToken, handleGetMyWatchlist);
 router.get('/watchlist/continue-watching', authenticateToken, handleGetContinueWatching);
 router.get('/watchlist/pacing', authenticateToken, handleGetBingePacing);
 router.get('/watchlist/stalled-alerts', authenticateToken, handleGetStalledAlerts);
+router.get('/watchlist/feasibility', authenticateToken, handleGetDeadlineFeasibility);
 router.get('/watchlist/wrapped', authenticateToken, handleGetMonthlyWrapped);
 router.get('/watchlist/export', authenticateToken, handleExportWatchlist);
 router.post('/watchlist/log-episode', authenticateToken, handleLogEpisode);
