@@ -6,18 +6,24 @@ import {
   Text,
   TouchableOpacity,
   View,
-  ActivityIndicator
+  ActivityIndicator,
+  RefreshControl
 } from 'react-native';
 import { COLORS } from '../constants/theme';
 import apiClient from '../services/apiClient';
 import MediaCard from '../components/MediaCard';
+import MediaDetailModal from '../components/MediaDetailModal';
+import GenreOnboardingModal from '../components/GenreOnboardingModal';
 
-const OTT_FILTERS = ['All', 'Netflix', 'Prime Video', 'JioCinema', 'Apple TV+'];
+const OTT_FILTERS = ['For You (SQL)', 'All', 'Netflix', 'Prime Video', 'JioCinema', 'Apple TV+'];
 
 export default function DiscoverScreen() {
-  const [selectedOtt, setSelectedOtt] = useState('All');
+  const [selectedOtt, setSelectedOtt] = useState('For You (SQL)');
   const [mediaList, setMediaList] = useState([]);
+  const [selectedMedia, setSelectedMedia] = useState(null);
+  const [showTasteModal, setShowTasteModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchDiscoveryFeed(selectedOtt);
@@ -26,10 +32,12 @@ export default function DiscoverScreen() {
   async function fetchDiscoveryFeed(ott) {
     try {
       setLoading(true);
-      const endpoint =
-        ott === 'All'
-          ? '/catalog/search'
-          : `/catalog/by-platform/${encodeURIComponent(ott)}`;
+      let endpoint = '/catalog/search';
+      if (ott === 'For You (SQL)') {
+        endpoint = '/catalog/recommendations/personal';
+      } else if (ott !== 'All') {
+        endpoint = `/catalog/by-platform/${encodeURIComponent(ott)}`;
+      }
       const res = await apiClient.get(endpoint);
       setMediaList(res.data.data || []);
     } catch (err) {
@@ -37,6 +45,12 @@ export default function DiscoverScreen() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function onRefresh() {
+    setRefreshing(true);
+    await fetchDiscoveryFeed(selectedOtt);
+    setRefreshing(false);
   }
 
   async function handleQuickAdd(item) {
@@ -52,17 +66,22 @@ export default function DiscoverScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Discover Across OTTs</Text>
+      <View style={styles.topHeader}>
+        <Text style={styles.heading}>Discover & SQL Recs</Text>
+        <TouchableOpacity
+          style={styles.tuneBtn}
+          onPress={() => setShowTasteModal(true)}
+        >
+          <Text style={styles.tuneBtnText}>Tune Weights ⚙</Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.filterContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {OTT_FILTERS.map((ott) => (
             <TouchableOpacity
               key={ott}
-              style={[
-                styles.chip,
-                selectedOtt === ott && styles.chipActive
-              ]}
+              style={[styles.chip, selectedOtt === ott && styles.chipActive]}
               onPress={() => setSelectedOtt(ott)}
             >
               <Text
@@ -78,25 +97,65 @@ export default function DiscoverScreen() {
         </ScrollView>
       </View>
 
-      {loading ? (
+      {loading && !refreshing ? (
         <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 40 }} />
       ) : (
         <FlatList
           data={mediaList}
           keyExtractor={(item) => item.id}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={COLORS.primary}
+              colors={[COLORS.primary]}
+            />
+          }
           renderItem={({ item }) => (
-            <MediaCard item={item} onQuickAdd={handleQuickAdd} />
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => setSelectedMedia(item)}
+            >
+              <MediaCard item={item} onQuickAdd={handleQuickAdd} />
+            </TouchableOpacity>
           )}
           contentContainerStyle={{ paddingBottom: 24 }}
         />
       )}
+
+      <MediaDetailModal
+        visible={Boolean(selectedMedia)}
+        media={selectedMedia}
+        onClose={() => setSelectedMedia(null)}
+      />
+
+      <GenreOnboardingModal
+        visible={showTasteModal}
+        onClose={() => setShowTasteModal(false)}
+        onSaved={() => fetchDiscoveryFeed(selectedOtt)}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background, padding: 16 },
-  heading: { fontSize: 22, fontWeight: 'bold', color: COLORS.textPrimary, marginBottom: 12 },
+  topHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12
+  },
+  heading: { fontSize: 22, fontWeight: 'bold', color: COLORS.textPrimary },
+  tuneBtn: {
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.accent
+  },
+  tuneBtnText: { color: COLORS.accent, fontSize: 12, fontWeight: 'bold' },
   filterContainer: { marginBottom: 14 },
   chip: {
     backgroundColor: COLORS.surface,
@@ -107,10 +166,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border
   },
-  chipActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary
-  },
+  chipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   chipText: { color: COLORS.textSecondary, fontSize: 13, fontWeight: '600' },
   chipTextActive: { color: '#FFFFFF' }
 });
