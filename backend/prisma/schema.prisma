@@ -153,3 +153,68 @@ model GroupPollVote {
 
   @@unique([groupItemId, userId])
 }
+// =========================================================================
+// MODULE 2: HARSH (Catalog, Community Reviews & Hybrid Recommendations)
+// =========================================================================
+
+model MediaItem {
+  id             String    @id @default(uuid())
+  title          String
+  type           MediaType
+  synopsis       String?
+  releaseYear    Int?
+  runtimeMinutes Int?
+  totalEpisodes  Int?
+  genres         String[]
+  posterUrl      String?
+  avgRating      Float     @default(0)
+  createdAt      DateTime  @default(now())
+
+  streamingOptions StreamingOption[]
+  reviews          UserReview[]
+  recLogs          RecommendationLog[]
+  watchlist        WatchlistEntry[]
+  episodeLogs      EpisodeProgress[]
+  groupItems       GroupWatchlistItem[]
+
+  @@index([title])
+  @@index([type, releaseYear])
+}
+
+model StreamingOption {
+  id       String    @id @default(uuid())
+  mediaId  String
+  media    MediaItem @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  platform String
+  region   String    @default("IN")
+
+  @@unique([mediaId, platform, region])
+  @@index([platform])
+}
+
+model UserReview {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaId   String
+  media     MediaItem @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  rating    Int
+  body      String?
+  createdAt DateTime  @default(now())
+
+  @@unique([userId, mediaId])
+  @@index([mediaId])
+}
+
+model RecommendationLog {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaId   String
+  media     MediaItem @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  score     Float
+  reason    String?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
+}
