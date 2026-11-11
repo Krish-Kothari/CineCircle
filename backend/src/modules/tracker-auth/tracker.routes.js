@@ -20,12 +20,14 @@ const {
   handleCompleteMedia,
   handleGetWatchStats,
   handleExportWatchlist,
-  handleRemoveFromWatchlist
+  handleRemoveFromWatchlist,
+  handleGetSystemDiagnostics
 } = require('./watchlist.controller');
 
 const router = express.Router();
 const authLimiter = createRateLimiter({ windowMs: 60 * 1000, maxRequests: 20 });
 
+router.get('/diagnostics', handleGetSystemDiagnostics);
 router.post('/auth/register', authLimiter, register);
 router.post('/auth/login', authLimiter, login);
 router.get('/users/profile', authenticateToken, getMyProfile);

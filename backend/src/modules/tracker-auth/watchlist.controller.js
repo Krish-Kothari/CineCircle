@@ -118,3 +118,12 @@ module.exports = {
   handleExportWatchlist,
   handleRemoveFromWatchlist
 };
+
+const { getDatabaseDiagnosticsSql } = require('./diagnostics.sql');
+
+const handleGetSystemDiagnostics = asyncHandler(async (req, res) => {
+  const diagnostics = await getDatabaseDiagnosticsSql();
+  return sendSuccess(res, diagnostics, 'Fetched live PostgreSQL table and index diagnostics');
+});
+
+module.exports.handleGetSystemDiagnostics = handleGetSystemDiagnostics;
