@@ -10,6 +10,7 @@ const {
   handleGetGroupFeed,
   handleGetGroupActivity,
   handleNominateToGroup,
+  handleRecommendToFriend,
   handleLeaveGroup
 } = require('./groups.controller');
 
@@ -43,6 +44,9 @@ router.get('/:id/compatibility', requireGroupMember, handleGetSquadCompatibility
 
 // Shared Watchlist
 router.post('/:id/watchlist', requireGroupMember, handleNominateToGroup);
+
+// Friend-to-friend recommendations
+router.post('/:id/recommend-friend', requireGroupMember, handleRecommendToFriend);
 
 // Group Blend, Polls and Leaderboard
 router.get('/:id/blend-recs', requireGroupMember, handleGetGroupBlend);

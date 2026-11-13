@@ -24,6 +24,10 @@ const {
   getUserJoinedGroups
 } = require('./activity.sql');
 
+const {
+  recommendTitleToSquadFriend
+} = require('./recommend.friend.service');
+
 // Get all groups joined by the logged-in user
 const handleGetMyGroups = asyncHandler(async (req, res) => {
   const groups = await getUserJoinedGroups(req.user.id);
@@ -88,6 +92,26 @@ const handleNominateToGroup = asyncHandler(async (req, res) => {
   );
 });
 
+// Recommend a title to a friend in the squad
+const handleRecommendToFriend = asyncHandler(async (req, res) => {
+  if (!req.body.mediaId) {
+    return sendError(res, 'mediaId is required', 400);
+  }
+
+  const rec = await recommendTitleToSquadFriend(
+    req.params.id,
+    req.user.id,
+    req.body
+  );
+
+  return sendSuccess(
+    res,
+    rec,
+    'Sent recommendation to friend squad',
+    201
+  );
+});
+
 // Leave a squad
 const handleLeaveGroup = asyncHandler(async (req, res) => {
   const result = await leaveFriendGroup(req.user.id, req.params.id);
@@ -101,5 +125,6 @@ module.exports = {
   handleGetGroupFeed,
   handleGetGroupActivity,
   handleNominateToGroup,
+  handleRecommendToFriend,
   handleLeaveGroup
 };
