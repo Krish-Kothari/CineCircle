@@ -17,6 +17,7 @@ const {
   handleVoteOnPoll,
   handleGetGroupBlend,
   handleGetSquadLeaderboard,
+  handleGetSquadCompatibility,
   handleMarkWatchedTogether
 } = require('./polls.controller');
 
@@ -36,6 +37,9 @@ router.delete('/:id/leave', requireGroupMember, handleLeaveGroup);
 // Group Feed and Activity
 router.get('/:id/feed', requireGroupMember, handleGetGroupFeed);
 router.get('/:id/activity', requireGroupMember, handleGetGroupActivity);
+
+// Squad Compatibility
+router.get('/:id/compatibility', requireGroupMember, handleGetSquadCompatibility);
 
 // Shared Watchlist
 router.post('/:id/watchlist', requireGroupMember, handleNominateToGroup);
