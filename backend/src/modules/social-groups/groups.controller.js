@@ -1,22 +1,39 @@
+
 const asyncHandler = require('../../utils/asyncHandler');
 const { sendSuccess, sendError } = require('../../utils/apiResponse');
+
 const {
   validateCreateGroupInput,
   validateJoinByCodeInput,
   validateNominateMediaInput
 } = require('./groups.validators');
+
 const {
   createFriendGroup,
   joinGroupByInviteCode,
   leaveFriendGroup
 } = require('./groups.service');
+
 const {
   getGroupFeedById,
   nominateMediaToGroup
 } = require('./watchlist.group.service');
 
+const {
+  getSquadActivityStreamSql,
+  getUserJoinedGroups
+} = require('./activity.sql');
+
+// Get all groups joined by the logged-in user
+const handleGetMyGroups = asyncHandler(async (req, res) => {
+  const groups = await getUserJoinedGroups(req.user.id);
+  return sendSuccess(res, groups, 'Fetched user friend squads');
+});
+
+// Create a new friend squad
 const handleCreateGroup = asyncHandler(async (req, res) => {
   const validationError = validateCreateGroupInput(req.body);
+
   if (validationError) {
     return sendError(res, validationError, 400);
   }
@@ -25,8 +42,10 @@ const handleCreateGroup = asyncHandler(async (req, res) => {
   return sendSuccess(res, group, 'Friend squad created successfully', 201);
 });
 
+// Join a squad using an invite code
 const handleJoinByCode = asyncHandler(async (req, res) => {
   const validationError = validateJoinByCodeInput(req.body);
+
   if (validationError) {
     return sendError(res, validationError, 400);
   }
@@ -35,30 +54,52 @@ const handleJoinByCode = asyncHandler(async (req, res) => {
   return sendSuccess(res, group, `Joined squad: ${group.name}`);
 });
 
+// Get a squad's feed
 const handleGetGroupFeed = asyncHandler(async (req, res) => {
   const group = await getGroupFeedById(req.params.id);
   return sendSuccess(res, group, 'Fetched friend squad feed');
 });
 
+// Get a squad's activity stream
+const handleGetGroupActivity = asyncHandler(async (req, res) => {
+  const activity = await getSquadActivityStreamSql(req.params.id);
+  return sendSuccess(res, activity, 'Fetched squad live activity stream');
+});
+
+// Nominate a title to the squad watchlist
 const handleNominateToGroup = asyncHandler(async (req, res) => {
   const validationError = validateNominateMediaInput(req.body);
+
   if (validationError) {
     return sendError(res, validationError, 400);
   }
 
-  const nominated = await nominateMediaToGroup(req.params.id, req.user.id, req.body);
-  return sendSuccess(res, nominated, 'Title nominated to squad watchlist', 201);
+  const nominated = await nominateMediaToGroup(
+    req.params.id,
+    req.user.id,
+    req.body
+  );
+
+  return sendSuccess(
+    res,
+    nominated,
+    'Title nominated to squad watchlist',
+    201
+  );
 });
 
+// Leave a squad
 const handleLeaveGroup = asyncHandler(async (req, res) => {
   const result = await leaveFriendGroup(req.user.id, req.params.id);
   return sendSuccess(res, result, 'Left friend squad successfully');
 });
 
 module.exports = {
+  handleGetMyGroups,
   handleCreateGroup,
   handleJoinByCode,
   handleGetGroupFeed,
+  handleGetGroupActivity,
   handleNominateToGroup,
   handleLeaveGroup
 };

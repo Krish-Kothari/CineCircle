@@ -4,9 +4,11 @@ const { authenticateToken } = require('../../middlewares/auth.middleware');
 const { requireGroupMember } = require('../../middlewares/groupAccess.middleware');
 
 const {
+  handleGetMyGroups,
   handleCreateGroup,
   handleJoinByCode,
   handleGetGroupFeed,
+  handleGetGroupActivity,
   handleNominateToGroup,
   handleLeaveGroup
 } = require('./groups.controller');
@@ -20,15 +22,22 @@ const {
 
 const router = express.Router();
 
+// Authenticate every request to the Social Groups module
 router.use(authenticateToken);
+
+// User's friend squads
+router.get('/my-groups', handleGetMyGroups);
 
 // Social Groups: Creation, joining and membership
 router.post('/create', handleCreateGroup);
 router.post('/join-by-code', handleJoinByCode);
 router.delete('/:id/leave', requireGroupMember, handleLeaveGroup);
 
-// Group Feed and Shared Watchlist
+// Group Feed and Activity
 router.get('/:id/feed', requireGroupMember, handleGetGroupFeed);
+router.get('/:id/activity', requireGroupMember, handleGetGroupActivity);
+
+// Shared Watchlist
 router.post('/:id/watchlist', requireGroupMember, handleNominateToGroup);
 
 // Group Blend, Polls and Leaderboard
