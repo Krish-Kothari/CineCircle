@@ -15,6 +15,7 @@ const {
   handleVoteOnPoll,
   handleCompleteWatchParty,
   handleGetGroupBlend,
+  handleGetSquadDivergence,
   handleGetSquadOttCoverage,
   handleGetSquadLeaderboard,
   handleGetSquadCompatibility,
@@ -31,6 +32,7 @@ router.post('/join-by-code', handleJoinByCode);
 router.get('/:id/feed', requireGroupMember, handleGetGroupFeed);
 router.get('/:id/activity', requireGroupMember, handleGetGroupActivity);
 router.get('/:id/compatibility', requireGroupMember, handleGetSquadCompatibility);
+router.get('/:id/divergence', requireGroupMember, handleGetSquadDivergence);
 router.get('/:id/ott-coverage', requireGroupMember, handleGetSquadOttCoverage);
 router.post('/:id/watchlist', requireGroupMember, handleNominateToGroup);
 router.post('/:id/recommend-friend', requireGroupMember, handleRecommendToFriend);

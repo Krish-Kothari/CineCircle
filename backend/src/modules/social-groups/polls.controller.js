@@ -12,6 +12,7 @@ const {
 const { getSquadTasteCompatibilitySql } = require('./compatibility.sql');
 const { getGroupEngagementMetricsSql } = require('./engagement.sql');
 const { getSquadOttCoverageSql } = require('./ottOverlap.sql');
+const { getSquadTasteDivergenceSql } = require('./divergence.sql');
 
 const handleVoteOnPoll = asyncHandler(async (req, res) => {
   const { groupItemId } = req.body;
@@ -44,17 +45,23 @@ const handleCompleteWatchParty = asyncHandler(async (req, res) => {
 });
 
 const handleGetGroupBlend = asyncHandler(async (req, res) => {
-  const [blend, ottCoverage] = await Promise.all([
+  const [blend, ottCoverage, divergence] = await Promise.all([
     getGroupBlendRecommendationsSql(req.params.id),
-    getSquadOttCoverageSql(req.params.id)
+    getSquadOttCoverageSql(req.params.id),
+    getSquadTasteDivergenceSql(req.params.id)
   ]);
   return sendSuccess(
     res,
     blend,
     'Generated Group Blend recommendations for squad',
     200,
-    { ottCoverage }
+    { ottCoverage, divergence }
   );
+});
+
+const handleGetSquadDivergence = asyncHandler(async (req, res) => {
+  const divergence = await getSquadTasteDivergenceSql(req.params.id);
+  return sendSuccess(res, divergence, 'Calculated squad taste divergence and outlier archetypes');
 });
 
 const handleGetSquadOttCoverage = asyncHandler(async (req, res) => {
@@ -93,6 +100,7 @@ module.exports = {
   handleVoteOnPoll,
   handleCompleteWatchParty,
   handleGetGroupBlend,
+  handleGetSquadDivergence,
   handleGetSquadOttCoverage,
   handleGetSquadLeaderboard,
   handleGetSquadCompatibility,
