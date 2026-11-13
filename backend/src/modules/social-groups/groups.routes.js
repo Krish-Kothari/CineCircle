@@ -17,6 +17,7 @@ const {
 const {
   handleVoteOnPoll,
   handleGetGroupBlend,
+  handleGetSquadOttCoverage,
   handleGetSquadLeaderboard,
   handleGetSquadCompatibility,
   handleMarkWatchedTogether
@@ -39,14 +40,29 @@ router.delete('/:id/leave', requireGroupMember, handleLeaveGroup);
 router.get('/:id/feed', requireGroupMember, handleGetGroupFeed);
 router.get('/:id/activity', requireGroupMember, handleGetGroupActivity);
 
-// Squad Compatibility
-router.get('/:id/compatibility', requireGroupMember, handleGetSquadCompatibility);
+// Squad Compatibility and Engagement
+router.get(
+  '/:id/compatibility',
+  requireGroupMember,
+  handleGetSquadCompatibility
+);
+
+// Squad OTT Subscription Coverage
+router.get(
+  '/:id/ott-coverage',
+  requireGroupMember,
+  handleGetSquadOttCoverage
+);
 
 // Shared Watchlist
 router.post('/:id/watchlist', requireGroupMember, handleNominateToGroup);
 
 // Friend-to-friend recommendations
-router.post('/:id/recommend-friend', requireGroupMember, handleRecommendToFriend);
+router.post(
+  '/:id/recommend-friend',
+  requireGroupMember,
+  handleRecommendToFriend
+);
 
 // Group Blend, Polls and Leaderboard
 router.get('/:id/blend-recs', requireGroupMember, handleGetGroupBlend);
