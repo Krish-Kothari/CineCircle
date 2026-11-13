@@ -1,6 +1,8 @@
+
 const express = require('express');
 const { authenticateToken } = require('../../middlewares/auth.middleware');
 const { requireGroupMember } = require('../../middlewares/groupAccess.middleware');
+
 const {
   handleCreateGroup,
   handleJoinByCode,
@@ -9,41 +11,30 @@ const {
   handleLeaveGroup
 } = require('./groups.controller');
 
+const {
+  handleVoteOnPoll,
+  handleGetGroupBlend,
+  handleGetSquadLeaderboard,
+  handleMarkWatchedTogether
+} = require('./polls.controller');
+
 const router = express.Router();
 
 router.use(authenticateToken);
 
+// Social Groups: Creation, joining and membership
 router.post('/create', handleCreateGroup);
 router.post('/join-by-code', handleJoinByCode);
-router.get('/:id/feed', requireGroupMember, handleGetGroupFeed);
-router.post('/:id/watchlist', requireGroupMember, handleNominateToGroup);
 router.delete('/:id/leave', requireGroupMember, handleLeaveGroup);
 
-module.exports = router;
-EOF
+// Group Feed and Shared Watchlist
+router.get('/:id/feed', requireGroupMember, handleGetGroupFeed);
+router.post('/:id/watchlist', requireGroupMember, handleNominateToGroup);
 
-cat << 'EOF' > backend/src/routes/index.js
-const express = require('express');
-const trackerRoutes = require('../modules/tracker-auth/tracker.routes');
-const catalogRoutes = require('../modules/catalog-recs/catalog.routes');
-const groupRoutes = require('../modules/social-groups/groups.routes');
-
-const router = express.Router();
-
-router.get('/', (req, res) => {
-  res.json({
-    success: true,
-    message: 'CineCircle API Router v1.0',
-    modules: {
-      trackerAuth: '/api/tracker (Krish)',
-      catalogRecs: '/api/catalog (Harsh)',
-      socialGroups: '/api/groups (Aryan)'
-    }
-  });
-});
-
-router.use('/tracker', trackerRoutes);
-router.use('/catalog', catalogRoutes);
-router.use('/groups', groupRoutes);
+// Group Blend, Polls and Leaderboard
+router.get('/:id/blend-recs', requireGroupMember, handleGetGroupBlend);
+router.post('/:id/polls/vote', requireGroupMember, handleVoteOnPoll);
+router.get('/:id/leaderboard', requireGroupMember, handleGetSquadLeaderboard);
+router.patch('/:id/mark-watched', requireGroupMember, handleMarkWatchedTogether);
 
 module.exports = router;
