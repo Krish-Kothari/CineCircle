@@ -9,6 +9,7 @@ const {
   handleGetGroupActivity,
   handleNominateToGroup,
   handleRecommendToFriend,
+  handleTransferAdmin,
   handleLeaveGroup
 } = require('./groups.controller');
 const {
@@ -36,6 +37,7 @@ router.get('/:id/divergence', requireGroupMember, handleGetSquadDivergence);
 router.get('/:id/ott-coverage', requireGroupMember, handleGetSquadOttCoverage);
 router.post('/:id/watchlist', requireGroupMember, handleNominateToGroup);
 router.post('/:id/recommend-friend', requireGroupMember, handleRecommendToFriend);
+router.patch('/:id/transfer-admin', requireGroupMember, handleTransferAdmin);
 router.get('/:id/blend-recs', requireGroupMember, handleGetGroupBlend);
 router.post('/:id/polls/vote', requireGroupMember, handleVoteOnPoll);
 router.post('/:id/polls/complete-party', requireGroupMember, handleCompleteWatchParty);
