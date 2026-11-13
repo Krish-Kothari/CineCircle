@@ -9,7 +9,7 @@ function withPlatforms(item) {
   return { ...item, platforms: item.streamingOptions.map((s) => s.platform) };
 }
 
-async function listCatalog({ search, platform, genre, type, page, limit }) {
+async function listCatalog({ search, platform, region, genre, type, page, limit }) {
   const take = Math.min(Math.max(parseInt(limit, 10) || 10, 1), 50);
   const currentPage = Math.max(parseInt(page, 10) || 1, 1);
 
@@ -17,9 +17,12 @@ async function listCatalog({ search, platform, genre, type, page, limit }) {
   if (search) where.title = { contains: search, mode: 'insensitive' };
   if (type) where.type = type;
   if (genre) where.genres = { has: genre };
-  if (platform) {
+  if (platform || region) {
     where.streamingOptions = {
-      some: { platform: { equals: platform, mode: 'insensitive' } }
+      some: {
+        ...(platform ? { platform: { equals: platform, mode: 'insensitive' } } : {}),
+        ...(region ? { region: { equals: region, mode: 'insensitive' } } : {})
+      }
     };
   }
 
@@ -28,7 +31,7 @@ async function listCatalog({ search, platform, genre, type, page, limit }) {
     prisma.mediaItem.findMany({
       where,
       include,
-      orderBy: [{ avgRating: 'desc' }, { title: 'asc' }],
+      orderBy: [{ avgRating: 'desc' }, { title: 'asc' }, { id: 'asc' }],
       skip: (currentPage - 1) * take,
       take
     })

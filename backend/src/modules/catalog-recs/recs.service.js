@@ -81,7 +81,10 @@ async function getRecommendations(userId, limit) {
     LIMIT ${limit}::int
   `;
 
-  if (!rows.length) return [];
+  if (!rows.length) {
+    await prisma.recommendationLog.deleteMany({ where: { userId } });
+    return [];
+  }
 
   const media = await prisma.mediaItem.findMany({
     where: { id: { in: rows.map((r) => r.id) } },

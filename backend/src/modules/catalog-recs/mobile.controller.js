@@ -4,7 +4,16 @@ const { upsertReview } = require('./reviews.service');
 
 // GET /catalog/by-platform/:ott (mobile Discover screen)
 const handleByPlatform = asyncHandler(async (req, res) => {
-  const result = await listCatalog({ platform: req.params.ott, page: 1, limit: 50 });
+  const platform = req.params.ott;
+  const { region } = req.query;
+  if (typeof platform !== 'string' || platform.trim() === '') {
+    return res.status(400).json({ success: false, message: 'platform must be a non-empty string' });
+  }
+  if (region !== undefined && (typeof region !== 'string' || (region.trim() === '' && region !== ''))) {
+    return res.status(400).json({ success: false, message: 'region must be a non-empty string' });
+  }
+
+  const result = await listCatalog({ platform, region, page: 1, limit: 50 });
   return res.json({
     success: true,
     message: 'Fetched catalog by platform',
