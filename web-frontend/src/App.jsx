@@ -8,6 +8,8 @@ import axiosClient from './api/axiosClient';
 // Catalog pages
 import CatalogExplorerPage from './pages/catalog/CatalogExplorerPage';
 import MediaDetailPage from './pages/catalog/MediaDetailPage';
+import AdminCuratorPage from './pages/catalog/AdminCuratorPage';
+import RecommendationHistoryPage from './pages/catalog/RecommendationHistoryPage';
 
 // Tracker pages
 import WatchlistPage from './pages/tracker/WatchlistPage';
@@ -96,6 +98,8 @@ export default function App() {
           {/* Catalog */}
           <Route path="/" element={<CatalogExplorerPage />} />
           <Route path="/media/:id" element={<MediaDetailPage />} />
+          <Route path="/curator" element={<AdminCuratorPage />} />
+          <Route path="/rec-logs" element={<RecommendationHistoryPage />} />
 
           {/* Tracker */}
           <Route path="/watchlist" element={<WatchlistPage />} />
