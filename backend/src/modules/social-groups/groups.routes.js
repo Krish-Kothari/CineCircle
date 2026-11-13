@@ -46,3 +46,5 @@ router.patch('/:id/mark-watched', requireGroupMember, handleMarkWatchedTogether)
 router.delete('/:id/leave', requireGroupMember, handleLeaveGroup);
 
 module.exports = router;
+
+
