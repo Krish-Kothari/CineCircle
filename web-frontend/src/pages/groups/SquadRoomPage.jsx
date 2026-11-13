@@ -1,8 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
+
 import SquadActivityTimeline from '../../components/SquadActivityTimeline';
+import NominateMovieModal from '../../components/NominateMovieModal';
 
 export default function SquadRoomPage() {
   const { id } = useParams();
@@ -34,6 +35,7 @@ export default function SquadRoomPage() {
     }
   }
 
+  // Handle voting on a squad nomination
   async function handleVote(groupItemId) {
     try {
       const res = await axiosClient.post(
@@ -51,6 +53,7 @@ export default function SquadRoomPage() {
     }
   }
 
+  // Nominate a title from Group Blend recommendations
   async function handleNominateFromBlend(mediaId, title) {
     try {
       await axiosClient.post(`/groups/${id}/watchlist`, {
@@ -100,6 +103,15 @@ export default function SquadRoomPage() {
         )}
       </div>
 
+      {/* Movie Nomination Modal */}
+      <NominateMovieModal
+        groupId={id}
+        onNominated={async () => {
+          setFeedback('Pitch added to Squad Watchlist!');
+          await loadSquadRoom();
+        }}
+      />
+
       {/* Watch Tonight Poll and Squad Leaderboard */}
       <div
         className="grid-cards"
@@ -108,6 +120,7 @@ export default function SquadRoomPage() {
           marginBottom: 28
         }}
       >
+        {/* Watch Tonight Poll */}
         <div className="card">
           <h3 style={{ marginBottom: 14 }}>
             Watch Tonight Poll (ACID Quorum Auto-Lock)
