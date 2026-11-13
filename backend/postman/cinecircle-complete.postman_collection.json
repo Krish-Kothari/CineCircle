@@ -1,0 +1,51 @@
+{
+  "info": {
+    "name": "CineCircle Social Engine — Complete ASD & DE Viva Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Krish — Login & Get JWT",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:5000/api/tracker/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"emailOrUsername\": \"krish@nst.edu\", \"password\": \"password123\"}"
+        }
+      }
+    },
+    {
+      "name": "2. Krish — SQL Watch Stats & Continue Watching",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+        "url": "http://localhost:5000/api/tracker/watchlist/stats"
+      }
+    },
+    {
+      "name": "3. Harsh — Hybrid & Collaborative SQL Recommendations",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+        "url": "http://localhost:5000/api/catalog/recommendations/personal"
+      }
+    },
+    {
+      "name": "4. Aryan — Join Friend Squad by Code (NST202)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+        ],
+        "url": "http://localhost:5000/api/groups/join-by-code",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"inviteCode\": \"NST202\"}"
+        }
+      }
+    }
+  ]
+}
