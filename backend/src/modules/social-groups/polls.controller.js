@@ -124,3 +124,12 @@ const handleGetVetoBlend = asyncHandler(async (req, res) => {
 });
 
 module.exports.handleGetVetoBlend = handleGetVetoBlend;
+
+const { getSquadMilestonesSql } = require('./squadMilestones');
+
+const handleGetSquadBadges = asyncHandler(async (req, res) => {
+  const badges = await getSquadMilestonesSql(req.params.id);
+  return sendSuccess(res, badges, 'Fetched collective squad milestone badges');
+});
+
+module.exports.handleGetSquadBadges = handleGetSquadBadges;
