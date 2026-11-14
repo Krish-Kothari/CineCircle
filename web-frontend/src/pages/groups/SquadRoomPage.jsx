@@ -5,6 +5,7 @@ import SquadActivityTimeline from '../../components/SquadActivityTimeline';
 import NominateMovieModal from '../../components/NominateMovieModal';
 import TonightsPickHero from '../../components/TonightsPickHero';
 import SquadVetoPanel from '../../components/SquadVetoPanel';
+import SquadBadgesPanel from '../../components/SquadBadgesPanel';
 
 export default function SquadRoomPage() {
   const { id } = useParams();
@@ -85,6 +86,8 @@ export default function SquadRoomPage() {
         </div>
         {feedback && <span style={{ color: '#22c55e', fontWeight: 600 }}>{feedback}</span>}
       </div>
+
+      <SquadBadgesPanel groupId={id} />
 
       <TonightsPickHero
         item={tonightsPick}
