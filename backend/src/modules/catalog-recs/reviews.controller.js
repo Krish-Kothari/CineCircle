@@ -1,6 +1,12 @@
 const asyncHandler = require('../../utils/asyncHandler');
 const { upsertReview, listReviews, deleteReview } = require('./reviews.service');
 
+function isMalformedIntegerParam(value) {
+  return typeof value !== 'string' || (value !== '' && (
+    !/^-?\d+$/.test(value) || !Number.isSafeInteger(Number(value))
+  ));
+}
+
 const handleUpsertReview = asyncHandler(async (req, res) => {
   const { rating, body } = req.body || {};
 
@@ -31,6 +37,11 @@ const handleUpsertReview = asyncHandler(async (req, res) => {
 });
 
 const handleListReviews = asyncHandler(async (req, res) => {
+  for (const name of ['page', 'limit']) {
+    if (req.query[name] !== undefined && isMalformedIntegerParam(req.query[name])) {
+      return res.status(400).json({ success: false, message: `${name} must be an integer` });
+    }
+  }
   const result = await listReviews(req.params.id, req.query);
   if (!result) {
     return res.status(404).json({ success: false, message: 'Media not found' });

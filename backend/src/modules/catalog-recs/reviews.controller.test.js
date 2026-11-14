@@ -93,3 +93,58 @@ test('returns not found for an invalid or missing media ID', async () => {
     loaded.restore();
   }
 });
+
+test('rejects malformed review pagination before calling the service', async () => {
+  let calls = 0;
+  const loaded = loadControllerWithService({
+    listReviews: async () => { calls += 1; return null; }
+  });
+  try {
+    for (const query of [
+      { page: '2x' },
+      { limit: '1.5' },
+      { page: ['1', '2'] },
+      { limit: '9007199254740992' }
+    ]) {
+      const res = await invoke(loaded.controller.handleListReviews, {
+        params: { id: 'media-1' }, query
+      });
+      assert.equal(res.statusCode, 400);
+      const field = query.page === undefined ? 'limit' : 'page';
+      assert.deepEqual(res.body, { success: false, message: `${field} must be an integer` });
+    }
+    assert.equal(calls, 0);
+  } finally {
+    loaded.restore();
+  }
+});
+
+test('passes valid review pagination and keeps the existing listing response', async () => {
+  const result = {
+    items: [{ id: 'review-1' }],
+    mediaAvgRating: 8,
+    pagination: { page: 2, limit: 5, total: 6, totalPages: 2 }
+  };
+  const loaded = loadControllerWithService({
+    listReviews: async (mediaId, query) => {
+      assert.equal(mediaId, 'media-1');
+      assert.deepEqual(query, { page: '2', limit: '5' });
+      return result;
+    }
+  });
+  try {
+    const res = await invoke(loaded.controller.handleListReviews, {
+      params: { id: 'media-1' }, query: { page: '2', limit: '5' }
+    });
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(res.body, {
+      success: true,
+      message: 'Fetched reviews',
+      data: result.items,
+      mediaAvgRating: 8,
+      pagination: result.pagination
+    });
+  } finally {
+    loaded.restore();
+  }
+});

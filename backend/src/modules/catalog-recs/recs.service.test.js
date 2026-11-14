@@ -76,7 +76,7 @@ test('returns scored recommendations and replaces that user’s log batch', asyn
     popularityScore: 0.8, hasCollab: true, matchedGenres: ['Drama'],
     myPlatforms: ['StreamCo'], finalScore: 0.75
   }];
-  const { prisma } = queryStub(rows);
+  const { prisma, getSql } = queryStub(rows);
   const transactions = [];
   let transactionArgs;
   prisma.mediaItem = {
@@ -105,6 +105,7 @@ test('returns scored recommendations and replaces that user’s log batch', asyn
   const loaded = loadServiceWithPrisma(prisma);
   try {
     const result = await loaded.service.getRecommendations('user-2', 5);
+    assert.match(getSql(), /ORDER BY "finalScore" DESC, m\.title ASC, m\.id ASC/);
     assert.equal(result.length, 1);
     assert.equal(result[0].score, 0.75);
     assert.deepEqual(result[0].platforms, ['StreamCo']);

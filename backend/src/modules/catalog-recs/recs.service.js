@@ -77,7 +77,7 @@ async function getRecommendations(userId, limit) {
     LEFT JOIN collab cf ON cf."mediaId" = m.id
     LEFT JOIN plat pl ON pl."mediaId" = m.id
     WHERE m.id NOT IN (SELECT "mediaId" FROM excluded)
-    ORDER BY "finalScore" DESC, m.title ASC
+    ORDER BY "finalScore" DESC, m.title ASC, m.id ASC
     LIMIT ${limit}::int
   `;
 

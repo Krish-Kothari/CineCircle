@@ -56,6 +56,7 @@ test('rejects invalid media types and malformed query values', async () => {
       [{ region: '   ' }, 'region cannot be blank'],
       [{ genre: ['Drama'] }, 'genre must be a single string'],
       [{ page: '2x' }, 'page must be an integer'],
+      [{ page: '9007199254740992' }, 'page must be an integer'],
       [{ limit: '1.5' }, 'limit must be an integer'],
       [{ page: ['1', '2'] }, 'page must be an integer']
     ];

@@ -125,6 +125,19 @@ test('deletes only the requesting user’s review and recalculates the remaining
   }
 });
 
+test('resets the media average to zero when its last review is deleted', async () => {
+  const { prisma, reviews, ratings } = inMemoryPrisma();
+  const loaded = loadServiceWithPrisma(prisma);
+  try {
+    await loaded.service.upsertReview('owner', 'media-1', { rating: 6 });
+    assert.deepEqual(await loaded.service.deleteReview('owner', 'media-1'), { mediaAvgRating: 0 });
+    assert.equal(reviews.size, 0);
+    assert.deepEqual(ratings.at(-1), { mediaId: 'media-1', avgRating: 0 });
+  } finally {
+    loaded.restore();
+  }
+});
+
 test('returns null for a missing media item without creating a review', async () => {
   const { prisma, reviews } = inMemoryPrisma();
   const loaded = loadServiceWithPrisma(prisma);

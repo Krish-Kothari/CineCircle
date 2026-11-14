@@ -5,7 +5,9 @@ const VALID_TYPES = ['MOVIE', 'TV_SHOW'];
 const TEXT_FILTERS = ['search', 'platform', 'region', 'genre'];
 
 function isMalformedIntegerParam(value) {
-  return typeof value !== 'string' || (value !== '' && !/^-?\d+$/.test(value));
+  return typeof value !== 'string' || (value !== '' && (
+    !/^-?\d+$/.test(value) || !Number.isSafeInteger(Number(value))
+  ));
 }
 
 const handleListCatalog = asyncHandler(async (req, res) => {
