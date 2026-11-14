@@ -133,3 +133,12 @@ const handleGetSquadBadges = asyncHandler(async (req, res) => {
 });
 
 module.exports.handleGetSquadBadges = handleGetSquadBadges;
+
+const { getOptimalSquadTimeSlotSql } = require('./schedule.sql');
+
+const handleGetOptimalTimeSlot = asyncHandler(async (req, res) => {
+  const slots = await getOptimalSquadTimeSlotSql(req.params.id);
+  return sendSuccess(res, slots, 'Calculated optimal squad watch party time slots');
+});
+
+module.exports.handleGetOptimalTimeSlot = handleGetOptimalTimeSlot;
