@@ -16,8 +16,6 @@ const { getContinueWatchingSql } = require('./binge.sql');
 const { getUserMilestonesSql } = require('./milestone.sql');
 const { getBingePacingEstimatesSql } = require('./pacing.sql');
 const { getStalledWatchlistAlertsSql } = require('./churn.sql');
-const { getMonthlyWrappedSql } = require('./wrapped.sql');
-const { getWatchlistDeadlineFeasibilitySql } = require('./priority.sql');
 
 const handleUpsertWatchlist = asyncHandler(async (req, res) => {
   const validationError = validateWatchlistUpsert(req.body);
@@ -49,16 +47,6 @@ const handleGetStalledAlerts = asyncHandler(async (req, res) => {
   return sendSuccess(res, alerts, 'Fetched stalled binge and dormant watchlist risk alerts');
 });
 
-const handleGetDeadlineFeasibility = asyncHandler(async (req, res) => {
-  const feasibility = await getWatchlistDeadlineFeasibilitySql(req.user.id);
-  return sendSuccess(res, feasibility, 'Calculated required daily minutes and target deadline feasibility');
-});
-
-const handleGetMonthlyWrapped = asyncHandler(async (req, res) => {
-  const wrapped = await getMonthlyWrappedSql(req.user.id);
-  return sendSuccess(res, wrapped, 'Calculated 30-day monthly rewind and binge habits');
-});
-
 const handleLogEpisode = asyncHandler(async (req, res) => {
   const result = await logEpisodeWatched(req.user.id, req.body);
   return sendSuccess(res, result, 'Episode progress logged', 201);
@@ -75,21 +63,19 @@ const handleCompleteMedia = asyncHandler(async (req, res) => {
 });
 
 const handleGetWatchStats = asyncHandler(async (req, res) => {
-  const [stats, summaryView, weeklyVelocity, continueWatching, milestones, pacing, stalled, wrapped, feasibility] = await Promise.all([
+  const [stats, summaryView, weeklyVelocity, continueWatching, milestones, pacing, stalled] = await Promise.all([
     getUserWatchAnalyticsSql(req.user.id),
     getUserWatchSummaryFromSql(req.user.id),
     getWeeklyWatchVelocitySql(req.user.id),
     getContinueWatchingSql(req.user.id),
     getUserMilestonesSql(req.user.id),
     getBingePacingEstimatesSql(req.user.id),
-    getStalledWatchlistAlertsSql(req.user.id),
-    getMonthlyWrappedSql(req.user.id),
-    getWatchlistDeadlineFeasibilitySql(req.user.id)
+    getStalledWatchlistAlertsSql(req.user.id)
   ]);
   return sendSuccess(
     res,
-    { ...stats, summaryView, weeklyVelocity, continueWatching, milestones, pacing, stalled, wrapped, feasibility },
-    'Fetched comprehensive SQL watch-time, pacing feasibility, and habit analytics'
+    { ...stats, summaryView, weeklyVelocity, continueWatching, milestones, pacing, stalled },
+    'Fetched comprehensive SQL watch-time, churn risk, and velocity analytics'
   );
 });
 
@@ -110,20 +96,9 @@ module.exports = {
   handleGetContinueWatching,
   handleGetBingePacing,
   handleGetStalledAlerts,
-  handleGetDeadlineFeasibility,
-  handleGetMonthlyWrapped,
   handleLogEpisode,
   handleCompleteMedia,
   handleGetWatchStats,
   handleExportWatchlist,
   handleRemoveFromWatchlist
 };
-
-const { getDatabaseDiagnosticsSql } = require('./diagnostics.sql');
-
-const handleGetSystemDiagnostics = asyncHandler(async (req, res) => {
-  const diagnostics = await getDatabaseDiagnosticsSql();
-  return sendSuccess(res, diagnostics, 'Fetched live PostgreSQL table and index diagnostics');
-});
-
-module.exports.handleGetSystemDiagnostics = handleGetSystemDiagnostics;

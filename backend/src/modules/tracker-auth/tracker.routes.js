@@ -14,20 +14,16 @@ const {
   handleGetContinueWatching,
   handleGetBingePacing,
   handleGetStalledAlerts,
-  handleGetDeadlineFeasibility,
-  handleGetMonthlyWrapped,
   handleLogEpisode,
   handleCompleteMedia,
   handleGetWatchStats,
   handleExportWatchlist,
-  handleRemoveFromWatchlist,
-  handleGetSystemDiagnostics
+  handleRemoveFromWatchlist
 } = require('./watchlist.controller');
 
 const router = express.Router();
 const authLimiter = createRateLimiter({ windowMs: 60 * 1000, maxRequests: 20 });
 
-router.get('/diagnostics', handleGetSystemDiagnostics);
 router.post('/auth/register', authLimiter, register);
 router.post('/auth/login', authLimiter, login);
 router.get('/users/profile', authenticateToken, getMyProfile);
@@ -38,8 +34,6 @@ router.get('/watchlist/my-list', authenticateToken, handleGetMyWatchlist);
 router.get('/watchlist/continue-watching', authenticateToken, handleGetContinueWatching);
 router.get('/watchlist/pacing', authenticateToken, handleGetBingePacing);
 router.get('/watchlist/stalled-alerts', authenticateToken, handleGetStalledAlerts);
-router.get('/watchlist/feasibility', authenticateToken, handleGetDeadlineFeasibility);
-router.get('/watchlist/wrapped', authenticateToken, handleGetMonthlyWrapped);
 router.get('/watchlist/export', authenticateToken, handleExportWatchlist);
 router.post('/watchlist/log-episode', authenticateToken, handleLogEpisode);
 router.post('/watchlist/complete-media', authenticateToken, handleCompleteMedia);
