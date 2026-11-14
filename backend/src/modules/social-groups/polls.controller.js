@@ -114,3 +114,13 @@ module.exports = {
   handleGetSquadCompatibility,
   handleMarkWatchedTogether
 };
+
+const { getVetoFilteredGroupBlendSql } = require('./veto.service');
+
+const handleGetVetoBlend = asyncHandler(async (req, res) => {
+  const rawVetoes = req.query.veto ? req.query.veto.split(',') : [];
+  const results = await getVetoFilteredGroupBlendSql(req.params.id, rawVetoes);
+  return sendSuccess(res, results, `Generated Group Blend excluding vetoed genres: [${rawVetoes.join(', ')}]`);
+});
+
+module.exports.handleGetVetoBlend = handleGetVetoBlend;

@@ -16,6 +16,7 @@ const {
   handleVoteOnPoll,
   handleCompleteWatchParty,
   handleGetGroupBlend,
+  handleGetVetoBlend,
   handleGetSquadVolatility,
   handleGetSquadDivergence,
   handleGetSquadOttCoverage,
@@ -41,6 +42,7 @@ router.post('/:id/watchlist', requireGroupMember, handleNominateToGroup);
 router.post('/:id/recommend-friend', requireGroupMember, handleRecommendToFriend);
 router.patch('/:id/transfer-admin', requireGroupMember, handleTransferAdmin);
 router.get('/:id/blend-recs', requireGroupMember, handleGetGroupBlend);
+router.get('/:id/blend-veto', requireGroupMember, handleGetVetoBlend);
 router.post('/:id/polls/vote', requireGroupMember, handleVoteOnPoll);
 router.post('/:id/polls/complete-party', requireGroupMember, handleCompleteWatchParty);
 router.get('/:id/leaderboard', requireGroupMember, handleGetSquadLeaderboard);
