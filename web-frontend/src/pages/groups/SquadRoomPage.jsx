@@ -6,12 +6,15 @@ import NominateMovieModal from '../../components/NominateMovieModal';
 import TonightsPickHero from '../../components/TonightsPickHero';
 import SquadVetoPanel from '../../components/SquadVetoPanel';
 import SquadBadgesPanel from '../../components/SquadBadgesPanel';
+import SquadSchedulePlanner from '../../components/SquadSchedulePlanner';
+import SquadRosterModal from '../../components/SquadRosterModal';
 
 export default function SquadRoomPage() {
   const { id } = useParams();
   const [group, setGroup] = useState(null);
   const [blendRecs, setBlendRecs] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
+  const [showRosterModal, setShowRosterModal] = useState(false);
   const [feedback, setFeedback] = useState('');
 
   useEffect(() => {
@@ -84,7 +87,12 @@ export default function SquadRoomPage() {
           <h2>{group.name} (Invite Code: {group.inviteCode})</h2>
           <p style={{ color: '#94a3b8', fontSize: 13 }}>{group.description}</p>
         </div>
-        {feedback && <span style={{ color: '#22c55e', fontWeight: 600 }}>{feedback}</span>}
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {feedback && <span style={{ color: '#22c55e', fontWeight: 600 }}>{feedback}</span>}
+          <button className="btn-outline" onClick={() => setShowRosterModal(true)}>
+            View Squad Roster ({group.members?.length || 0})
+          </button>
+        </div>
       </div>
 
       <SquadBadgesPanel groupId={id} />
@@ -181,7 +189,15 @@ export default function SquadRoomPage() {
         </div>
       </div>
 
+      <SquadSchedulePlanner groupId={id} />
       <SquadActivityTimeline groupId={id} />
+
+      {showRosterModal && (
+        <SquadRosterModal
+          group={group}
+          onClose={() => setShowRosterModal(false)}
+        />
+      )}
     </div>
   );
 }
