@@ -13,6 +13,7 @@ const { getSquadTasteCompatibilitySql } = require('./compatibility.sql');
 const { getGroupEngagementMetricsSql } = require('./engagement.sql');
 const { getSquadOttCoverageSql } = require('./ottOverlap.sql');
 const { getSquadTasteDivergenceSql } = require('./divergence.sql');
+const { getSquadDebateVolatilitySql } = require('./debateVolatility.sql');
 
 const handleVoteOnPoll = asyncHandler(async (req, res) => {
   const { groupItemId } = req.body;
@@ -45,18 +46,24 @@ const handleCompleteWatchParty = asyncHandler(async (req, res) => {
 });
 
 const handleGetGroupBlend = asyncHandler(async (req, res) => {
-  const [blend, ottCoverage, divergence] = await Promise.all([
+  const [blend, ottCoverage, divergence, volatility] = await Promise.all([
     getGroupBlendRecommendationsSql(req.params.id),
     getSquadOttCoverageSql(req.params.id),
-    getSquadTasteDivergenceSql(req.params.id)
+    getSquadTasteDivergenceSql(req.params.id),
+    getSquadDebateVolatilitySql(req.params.id)
   ]);
   return sendSuccess(
     res,
     blend,
     'Generated Group Blend recommendations for squad',
     200,
-    { ottCoverage, divergence }
+    { ottCoverage, divergence, volatility }
   );
+});
+
+const handleGetSquadVolatility = asyncHandler(async (req, res) => {
+  const volatility = await getSquadDebateVolatilitySql(req.params.id);
+  return sendSuccess(res, volatility, 'Calculated squad debate volatility and vote dispersion');
 });
 
 const handleGetSquadDivergence = asyncHandler(async (req, res) => {
@@ -100,6 +107,7 @@ module.exports = {
   handleVoteOnPoll,
   handleCompleteWatchParty,
   handleGetGroupBlend,
+  handleGetSquadVolatility,
   handleGetSquadDivergence,
   handleGetSquadOttCoverage,
   handleGetSquadLeaderboard,

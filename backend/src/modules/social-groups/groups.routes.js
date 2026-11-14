@@ -16,6 +16,7 @@ const {
   handleVoteOnPoll,
   handleCompleteWatchParty,
   handleGetGroupBlend,
+  handleGetSquadVolatility,
   handleGetSquadDivergence,
   handleGetSquadOttCoverage,
   handleGetSquadLeaderboard,
@@ -34,6 +35,7 @@ router.get('/:id/feed', requireGroupMember, handleGetGroupFeed);
 router.get('/:id/activity', requireGroupMember, handleGetGroupActivity);
 router.get('/:id/compatibility', requireGroupMember, handleGetSquadCompatibility);
 router.get('/:id/divergence', requireGroupMember, handleGetSquadDivergence);
+router.get('/:id/volatility', requireGroupMember, handleGetSquadVolatility);
 router.get('/:id/ott-coverage', requireGroupMember, handleGetSquadOttCoverage);
 router.post('/:id/watchlist', requireGroupMember, handleNominateToGroup);
 router.post('/:id/recommend-friend', requireGroupMember, handleRecommendToFriend);
@@ -46,5 +48,3 @@ router.patch('/:id/mark-watched', requireGroupMember, handleMarkWatchedTogether)
 router.delete('/:id/leave', requireGroupMember, handleLeaveGroup);
 
 module.exports = router;
-
-
