@@ -4,6 +4,7 @@ import axiosClient from '../../api/axiosClient';
 import SquadActivityTimeline from '../../components/SquadActivityTimeline';
 import NominateMovieModal from '../../components/NominateMovieModal';
 import TonightsPickHero from '../../components/TonightsPickHero';
+import SquadVetoPanel from '../../components/SquadVetoPanel';
 
 export default function SquadRoomPage() {
   const { id } = useParams();
@@ -27,6 +28,17 @@ export default function SquadRoomPage() {
     setLeaderboard(lbRes.data.data || []);
   }
 
+  async function handleApplyVeto(vetoedList) {
+    if (vetoedList.length === 0) {
+      const res = await axiosClient.get(`/groups/${id}/blend-recs`);
+      setBlendRecs(res.data.data || []);
+      return;
+    }
+    const res = await axiosClient.get(`/groups/${id}/blend-veto?veto=${vetoedList.join(',')}`);
+    setBlendRecs(res.data.data || []);
+    setFeedback(`Applied Veto: Excluded ${vetoedList.join(', ')} from squad blend.`);
+  }
+
   async function handleVote(groupItemId) {
     try {
       const res = await axiosClient.post(`/groups/${id}/polls/vote`, { groupItemId });
@@ -42,8 +54,8 @@ export default function SquadRoomPage() {
       const res = await axiosClient.post(`/groups/${id}/polls/complete-party`, { groupItemId });
       setFeedback(res.data.message);
       loadSquadRoom();
-    } catch (err) {
-      setFeedback(err.response?.data?.message || 'Failed to complete watch party');
+    } catch {
+      setFeedback('Failed to complete watch party');
     }
   }
 
@@ -142,25 +154,28 @@ export default function SquadRoomPage() {
         </div>
       </div>
 
-      <h3>Group Blend Matchmaker (Unseen Titles Matching All {group.members?.length} Members)</h3>
-      <div className="grid-cards">
-        {blendRecs.map((rec) => (
-          <div key={rec.id} className="card" style={{ borderColor: '#38bdf8' }}>
-            <h4>{rec.title} ({rec.releaseYear})</h4>
-            <p style={{ color: '#22c55e', fontSize: 12, margin: '6px 0' }}>
-              Shared Squad Taste Score: {rec.shared_taste_score} • ★ {rec.avgRating}
-            </p>
-            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 12 }}>
-              {(rec.genres || []).join(' • ')}
-            </p>
-            <button
-              className="btn-outline"
-              onClick={() => handleNominateFromBlend(rec.id, rec.title)}
-            >
-              + Nominate to Squad Poll
-            </button>
-          </div>
-        ))}
+      <div className="card" style={{ marginBottom: 20 }}>
+        <h3>Group Blend Matchmaker (Collective Squad Taste)</h3>
+        <SquadVetoPanel onApplyVeto={handleApplyVeto} />
+        <div className="grid-cards">
+          {blendRecs.map((rec) => (
+            <div key={rec.id} style={{ background: '#0b0f19', padding: 14, borderRadius: 10, border: '1px solid #1e293b' }}>
+              <h4>{rec.title} ({rec.releaseYear})</h4>
+              <p style={{ color: '#22c55e', fontSize: 12, margin: '6px 0' }}>
+                Shared Taste: {rec.shared_taste_score} • ★ {rec.avgRating}
+              </p>
+              <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 12 }}>
+                {(rec.genres || []).join(' • ')}
+              </p>
+              <button
+                className="btn-outline"
+                onClick={() => handleNominateFromBlend(rec.id, rec.title)}
+              >
+                + Nominate to Squad Poll
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       <SquadActivityTimeline groupId={id} />
