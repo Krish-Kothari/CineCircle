@@ -36,8 +36,8 @@ app.use(errorHandler);
 
 if (require.main === module) {
   const port = Number(process.env.PORT) || 5000;
-  app.listen(port, () => {
-    console.log(`CineCircle API listening on port ${port}`);
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`CineCircle API listening on port ${port} on all network interfaces`);
   });
 }
 

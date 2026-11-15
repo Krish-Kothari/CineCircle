@@ -4,11 +4,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import { flushOfflineEpisodeQueue } from '../services/offlineQueue';
-import { getActiveApiBaseUrl, setCustomApiBaseUrl } from '../services/apiClient';
+import {
+  DEFAULT_API_BASE_URL,
+  getActiveApiBaseUrl,
+  setCustomApiBaseUrl
+} from '../services/apiClient';
 
 export default function SettingsScreen() {
   const { user, logout } = useAuth();
-  const [apiUrl, setApiUrl] = useState('http://localhost:5000/api');
+  const [apiUrl, setApiUrl] = useState(DEFAULT_API_BASE_URL);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -111,5 +115,5 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     marginBottom: 16
   },
-  logoutText: { color: '#FFFFFF', fontWeight: 'bold' }
+  logoutText: { color: '#111111', fontWeight: 'bold' }
 });

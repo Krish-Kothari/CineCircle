@@ -57,5 +57,5 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center'
   },
-  retryText: { color: '#FFFFFF', fontWeight: 'bold' }
+  retryText: { color: '#111111', fontWeight: 'bold' }
 });

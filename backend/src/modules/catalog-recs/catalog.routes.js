@@ -12,11 +12,14 @@ const {
 } = require('./reviews.controller');
 const { handleGetRecommendations } = require('./recs.controller');
 const { handleByPlatform, handleSubmitReview } = require('./mobile.controller');
+const { handleOmdbSearch, handleOmdbTitle } = require('./omdb.controller');
 
 const router = express.Router();
 
 // Fixed paths must come before /:id
 router.get('/platforms', handleListPlatforms);
+router.get('/omdb/search', handleOmdbSearch);
+router.get('/omdb/:imdbId', handleOmdbTitle);
 router.get('/recommendations', authenticateToken, handleGetRecommendations);
 
 // Aliases used by the mobile app (Krish's ad-mobile-app)

@@ -17,6 +17,11 @@ export async function getAuthToken() {
   return AsyncStorage.getItem(KEYS.AUTH_TOKEN);
 }
 
+export async function getStoredUser() {
+  const raw = await AsyncStorage.getItem(KEYS.USER_PROFILE);
+  return raw ? JSON.parse(raw) : null;
+}
+
 export async function clearAuthSession() {
   await AsyncStorage.multiRemove([KEYS.AUTH_TOKEN, KEYS.USER_PROFILE]);
 }

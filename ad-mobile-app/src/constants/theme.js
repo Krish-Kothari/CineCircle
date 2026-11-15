@@ -1,13 +1,13 @@
 export const COLORS = {
-  background: '#0B0F19',
-  surface: '#151C2C',
-  primary: '#E50914',
-  accent: '#38BDF8',
-  textPrimary: '#F8FAFC',
-  textSecondary: '#94A3B8',
+  background: '#0F1115',
+  surface: '#1A1D22',
+  primary: '#F5C518',
+  accent: '#F5C518',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#A8A8A8',
   success: '#22C55E',
-  warning: '#F59E0B',
-  border: '#1E293B'
+  warning: '#F5C518',
+  border: '#333333'
 };
 
 export const OTT_BADGES = {

@@ -59,4 +59,8 @@ async function listPlatforms() {
   return rows.map((r) => r.platform);
 }
 
-module.exports = { listCatalog, getMediaById, listPlatforms };
+async function searchCatalog({ search, platform, genre, type, page, limit }) {
+  return listCatalog({ search, platform, genre, type, page, limit });
+}
+
+module.exports = { listCatalog, searchCatalog, getMediaById, listPlatforms };

@@ -1,6 +1,6 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import apiClient from '../services/apiClient';
-import { saveAuthSession, clearAuthSession } from '../utils/storage';
+import { saveAuthSession, clearAuthSession, getAuthToken, getStoredUser } from '../utils/storage';
 
 const AuthContext = createContext(null);
 
@@ -8,6 +8,20 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([getAuthToken(), getStoredUser()])
+      .then(([token, storedUser]) => {
+        if (active && token && storedUser) setUser(storedUser);
+      })
+      .catch(() => {
+        if (active) setError('Unable to restore the saved CineCircle session');
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   async function login(emailOrUsername, password) {
     try {

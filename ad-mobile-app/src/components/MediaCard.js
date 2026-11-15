@@ -98,5 +98,5 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 8
   },
-  addBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' }
+  addBtnText: { color: '#111111', fontSize: 12, fontWeight: 'bold' }
 });
