@@ -20,6 +20,7 @@ const {
   handleExportWatchlist,
   handleRemoveFromWatchlist
 } = require('./watchlist.controller');
+const { getDatabaseDiagnosticsSql } = require('./diagnostics.sql');
 
 const router = express.Router();
 const authLimiter = createRateLimiter({ windowMs: 60 * 1000, maxRequests: 20 });
@@ -39,5 +40,13 @@ router.post('/watchlist/log-episode', authenticateToken, handleLogEpisode);
 router.post('/watchlist/complete-media', authenticateToken, handleCompleteMedia);
 router.get('/watchlist/stats', authenticateToken, handleGetWatchStats);
 router.delete('/watchlist/:mediaId', authenticateToken, handleRemoveFromWatchlist);
+router.get('/diagnostics', authenticateToken, async (req, res, next) => {
+  try {
+    const diagnostics = await getDatabaseDiagnosticsSql();
+    return res.json({ success: true, message: 'Fetched database diagnostics', data: diagnostics });
+  } catch (error) {
+    return next(error);
+  }
+});
 
 module.exports = router;

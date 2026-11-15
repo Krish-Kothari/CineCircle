@@ -12,7 +12,7 @@ async function verifyAllModules() {
 
     // Harsh's 4 Tables
     MediaItem: await prisma.mediaItem.count(),
-    StreamingAvailability: await prisma.streamingAvailability.count(),
+    StreamingOption: await prisma.streamingOption.count(),
     UserReview: await prisma.userReview.count(),
     RecommendationLog: await prisma.recommendationLog.count(),
 

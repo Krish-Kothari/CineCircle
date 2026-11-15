@@ -3,6 +3,7 @@ const { sendSuccess, sendError } = require('../../utils/apiResponse');
 const { validateRegisterInput, validateGenrePreferences } = require('./tracker.validators');
 const { registerUser, loginUser, getUserProfileById } = require('./auth.service');
 const { upsertUserPreferences } = require('./preferences.service');
+const { updateUserProfile } = require('./profile.service');
 
 const register = asyncHandler(async (req, res) => {
   const validationError = validateRegisterInput(req.body);
@@ -31,6 +32,11 @@ const getMyProfile = asyncHandler(async (req, res) => {
   return sendSuccess(res, profile, 'Fetched user profile');
 });
 
+const handleUpdateProfile = asyncHandler(async (req, res) => {
+  const updated = await updateUserProfile(req.user.id, req.body);
+  return sendSuccess(res, updated, 'User profile updated successfully');
+});
+
 const updatePreferences = asyncHandler(async (req, res) => {
   const { preferences, subscribedOTTs } = req.body;
 
@@ -49,5 +55,6 @@ module.exports = {
   register,
   login,
   getMyProfile,
+  handleUpdateProfile,
   updatePreferences
 };

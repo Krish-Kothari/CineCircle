@@ -35,10 +35,10 @@ async function getGroupBlendRecommendationsSql(groupId) {
       m."avgRating",
       COALESCE(SUM(ct.group_genre_weight), 0)::int AS shared_taste_score,
       COALESCE(MAX(ct.members_sharing_genre), 1)::int AS members_matched,
-      ARRAY_AGG(DISTINCT s."platformName") FILTER (WHERE s."platformName" IS NOT NULL) AS platforms
+      ARRAY_AGG(DISTINCT s.platform) FILTER (WHERE s.platform IS NOT NULL) AS platforms
     FROM "MediaItem" m
     INNER JOIN collective_taste ct ON ct.genre = ANY(m.genres)
-    LEFT JOIN "StreamingAvailability" s ON s."mediaId" = m.id
+    LEFT JOIN "StreamingOption" s ON s."mediaId" = m.id
     WHERE m.id NOT IN (SELECT "mediaId" FROM seen_by_any_member)
     GROUP BY m.id
     ORDER BY shared_taste_score DESC, m."avgRating" DESC

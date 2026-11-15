@@ -1,5 +1,5 @@
 {
-  "name": "cinecircle-backend",
+  "name": "cine_circle",
   "version": "1.0.0",
   "description": "CineCircle Express + Prisma + PostgreSQL Backend",
   "main": "src/server.js",
@@ -7,6 +7,7 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "test": "node --test tests/*.test.js",
+    "preflight": "node scripts/verify-all-modules.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "node prisma/seed/index.js",

@@ -29,10 +29,10 @@ async function getVetoFilteredGroupBlendSql(groupId, vetoedGenres = []) {
       m.genres,
       m."avgRating",
       SUM(ct.group_weight)::int AS shared_taste_score,
-      ARRAY_AGG(DISTINCT s."platformName") FILTER (WHERE s."platformName" IS NOT NULL) AS platforms
+      ARRAY_AGG(DISTINCT s.platform) FILTER (WHERE s.platform IS NOT NULL) AS platforms
     FROM "MediaItem" m
     INNER JOIN collective_taste ct ON ct.genre = ANY(m.genres)
-    LEFT JOIN "StreamingAvailability" s ON s."mediaId" = m.id
+    LEFT JOIN "StreamingOption" s ON s."mediaId" = m.id
     WHERE m.id NOT IN (SELECT "mediaId" FROM seen_by_any)
       AND NOT (m.genres && ${safeVetoed}::text[])
     GROUP BY m.id

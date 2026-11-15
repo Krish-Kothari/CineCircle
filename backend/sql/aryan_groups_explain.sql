@@ -1,19 +1,16 @@
-cat << 'EOF' > backend/sql/aryan_groups_explain.sql
-
--- 1. Verify Index Scan on GroupMember(groupId, userId)
+-- Verify the GroupMember index and benchmark the group blend query.
 EXPLAIN ANALYZE
 SELECT "userId", role
 FROM "GroupMember"
 WHERE "groupId" = (SELECT id FROM "FriendGroup" LIMIT 1);
 
--- 2. Benchmark Group Blend Multi-User Taste Intersection CTE Query
 EXPLAIN ANALYZE
 WITH squad_members AS (
-  SELECT "userId" FROM "GroupMember" WHERE "groupId" = (SELECT id FROM "FriendGroup" LIMIT 1)
+  SELECT "userId" FROM "GroupMember"
+  WHERE "groupId" = (SELECT id FROM "FriendGroup" LIMIT 1)
 ),
 seen_by_any_member AS (
-  SELECT DISTINCT "mediaId"
-  FROM "WatchlistEntry"
+  SELECT DISTINCT "mediaId" FROM "WatchlistEntry"
   WHERE "userId" IN (SELECT "userId" FROM squad_members)
     AND status IN ('COMPLETED', 'WATCHING')
 ),
