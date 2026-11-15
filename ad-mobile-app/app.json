@@ -1,7 +1,12 @@
 {
-  "orientation": "portrait",
-  "userInterfaceStyle": "dark",
-  "ios": {
-    "bundleIdentifier": "com.anonymous.cinecircle-mobile"
+  "expo": {
+    "android": {
+      "package": "com.krishkothari.cinecircle"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "46db74ac-a524-4d29-a8bd-79bbb9192974"
+      }
+    }
   }
 }
