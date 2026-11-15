@@ -10,7 +10,7 @@ import {
 import { COLORS } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   const { login, loading, error } = useAuth();
   const [identifier, setIdentifier] = useState('krish@nst.edu');
   const [password, setPassword] = useState('password123');
@@ -53,6 +53,10 @@ export default function LoginScreen() {
           ) : (
             <Text style={styles.primaryButtonText}>Sign In</Text>
           )}
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => navigation.navigate('Signup')} disabled={loading}>
+          <Text style={styles.secondaryButtonText}>New to CineCircle? Sign Up</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -117,5 +121,11 @@ const styles = StyleSheet.create({
     color: '#111111',
     fontWeight: 'bold',
     fontSize: 16
+  },
+  secondaryButtonText: {
+    color: COLORS.accent,
+    textAlign: 'center',
+    fontSize: 13,
+    marginTop: 18
   }
 });

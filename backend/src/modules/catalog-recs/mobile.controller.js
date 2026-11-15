@@ -4,7 +4,8 @@ const { upsertReview } = require('./reviews.service');
 
 // GET /catalog/by-platform/:ott (mobile Discover screen)
 const handleByPlatform = asyncHandler(async (req, res) => {
-  const result = await listCatalog({ platform: req.params.ott, page: 1, limit: 50 });
+  const { page, limit } = req.query;
+  const result = await listCatalog({ platform: req.params.ott, page, limit });
   return res.json({
     success: true,
     message: 'Fetched catalog by platform',

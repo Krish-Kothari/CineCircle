@@ -4,6 +4,7 @@ const { validateWatchlistUpsert } = require('./tracker.validators');
 const {
   upsertWatchlistItem,
   getUserWatchlist,
+  getUserWatchlistPage,
   logEpisodeWatched,
   removeWatchlistItem
 } = require('./watchlist.service');
@@ -28,6 +29,17 @@ const handleUpsertWatchlist = asyncHandler(async (req, res) => {
 });
 
 const handleGetMyWatchlist = asyncHandler(async (req, res) => {
+  const page = req.query.page;
+  const limit = req.query.limit;
+  if (page || limit) {
+    const result = await getUserWatchlistPage(req.user.id, req.query.status, page, limit);
+    return res.json({
+      success: true,
+      message: 'Fetched user watchlist',
+      data: result.items,
+      pagination: result.pagination
+    });
+  }
   const list = await getUserWatchlist(req.user.id, req.query.status);
   return sendSuccess(res, list, 'Fetched user watchlist');
 });

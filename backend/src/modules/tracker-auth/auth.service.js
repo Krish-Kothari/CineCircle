@@ -2,9 +2,11 @@ const prisma = require('../../config/prisma');
 const { hashPassword, verifyPassword, generateAccessToken } = require('./auth.utils');
 
 async function registerUser({ name, username, email, password, subscribedOTTs = [] }) {
+  const normalizedUsername = username.trim().toLowerCase();
+  const normalizedEmail = email.trim().toLowerCase();
   const existingUser = await prisma.user.findFirst({
     where: {
-      OR: [{ email: email.toLowerCase() }, { username }]
+      OR: [{ email: normalizedEmail }, { username: normalizedUsername }]
     }
   });
 
@@ -19,8 +21,8 @@ async function registerUser({ name, username, email, password, subscribedOTTs = 
   const user = await prisma.user.create({
     data: {
       name,
-      username,
-      email: email.toLowerCase(),
+      username: normalizedUsername,
+      email: normalizedEmail,
       passwordHash,
       subscribedOTTs: Array.isArray(subscribedOTTs) ? subscribedOTTs : []
     },
@@ -41,10 +43,11 @@ async function registerUser({ name, username, email, password, subscribedOTTs = 
 
 async function loginUser({ emailOrUsername, password }) {
   const identifier = (emailOrUsername || '').trim();
+  const normalizedIdentifier = identifier.toLowerCase();
 
   const user = await prisma.user.findFirst({
     where: {
-      OR: [{ email: identifier.toLowerCase() }, { username: identifier }]
+      OR: [{ email: normalizedIdentifier }, { username: normalizedIdentifier }]
     },
     include: {
       genrePreferences: true

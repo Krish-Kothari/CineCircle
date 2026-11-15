@@ -11,6 +11,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "node prisma/seed/index.js",
+    "sync:posters": "node scripts/sync-omdb-posters.js",
     "verify:db": "node scripts/verify-all-modules.js",
     "benchmark:sql": "node scripts/benchmark-catalog-sql.js"
   },

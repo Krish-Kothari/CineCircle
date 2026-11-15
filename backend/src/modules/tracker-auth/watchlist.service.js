@@ -51,6 +51,34 @@ async function getUserWatchlist(userId, statusFilter) {
   });
 }
 
+async function getUserWatchlistPage(userId, statusFilter, page = 1, limit = 20) {
+  const take = Math.min(Math.max(Number(limit) || 20, 1), 50);
+  const currentPage = Math.max(Number(page) || 1, 1);
+  const whereClause = { userId };
+  if (statusFilter) whereClause.status = statusFilter.toUpperCase();
+
+  const [total, items] = await Promise.all([
+    prisma.watchlistEntry.count({ where: whereClause }),
+    prisma.watchlistEntry.findMany({
+      where: whereClause,
+      include: { media: { include: { streamingOptions: true } } },
+      orderBy: { updatedAt: 'desc' },
+      skip: (currentPage - 1) * take,
+      take
+    })
+  ]);
+
+  return {
+    items,
+    pagination: {
+      page: currentPage,
+      limit: take,
+      total,
+      totalPages: Math.ceil(total / take)
+    }
+  };
+}
+
 async function logEpisodeWatched(userId, { mediaId, seasonNumber = 1, episodeNumber }) {
   if (!mediaId || !episodeNumber) {
     const error = new Error('mediaId and episodeNumber are required');
@@ -66,6 +94,17 @@ async function logEpisodeWatched(userId, { mediaId, seasonNumber = 1, episodeNum
   }
 
   return prisma.$transaction(async (tx) => {
+    const existingEpisode = await tx.episodeProgress.findUnique({
+      where: {
+        userId_mediaId_seasonNumber_episodeNumber: {
+          userId,
+          mediaId,
+          seasonNumber: Number(seasonNumber),
+          episodeNumber: Number(episodeNumber)
+        }
+      }
+    });
+
     const episodeLog = await tx.episodeProgress.upsert({
       where: {
         userId_mediaId_seasonNumber_episodeNumber: {
@@ -88,7 +127,7 @@ async function logEpisodeWatched(userId, { mediaId, seasonNumber = 1, episodeNum
       where: { userId, mediaId }
     });
 
-    const newStatus = totalLogged >= media.totalEpisodes ? 'COMPLETED' : 'WATCHING';
+    const newStatus = media.totalEpisodes && totalLogged >= media.totalEpisodes ? 'COMPLETED' : 'WATCHING';
 
     const watchlistEntry = await tx.watchlistEntry.upsert({
       where: { userId_mediaId: { userId, mediaId } },
@@ -107,7 +146,7 @@ async function logEpisodeWatched(userId, { mediaId, seasonNumber = 1, episodeNum
     await tx.user.update({
       where: { id: userId },
       data: {
-        totalWatchMinutes: { increment: media.runtimeMinutes }
+        totalWatchMinutes: { increment: existingEpisode ? 0 : (media.runtimeMinutes || 0) }
       }
     });
 
@@ -118,5 +157,6 @@ async function logEpisodeWatched(userId, { mediaId, seasonNumber = 1, episodeNum
 module.exports = {
   upsertWatchlistItem,
   getUserWatchlist,
+  getUserWatchlistPage,
   logEpisodeWatched
 };

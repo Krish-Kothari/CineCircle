@@ -1,112 +1,53 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
-import { flushOfflineEpisodeQueue } from '../services/offlineQueue';
-import {
-  DEFAULT_API_BASE_URL,
-  getActiveApiBaseUrl,
-  setCustomApiBaseUrl
-} from '../services/apiClient';
 
 export default function SettingsScreen() {
   const { user, logout } = useAuth();
-  const [apiUrl, setApiUrl] = useState(DEFAULT_API_BASE_URL);
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    getActiveApiBaseUrl().then(setApiUrl);
-  }, []);
-
-  async function handleSaveApiUrl() {
-    await setCustomApiBaseUrl(apiUrl);
-    setMessage(`Saved Backend URL: ${apiUrl}`);
-  }
-
-  async function handleForceSync() {
-    const res = await flushOfflineEpisodeQueue();
-    setMessage(`Flushed ${res.flushedCount} pending offline episode logs!`);
-  }
-
-  async function handleClearLocalCache() {
-    await AsyncStorage.removeItem('@cinecircle_watchlist_cache');
-    await AsyncStorage.removeItem('@cinecircle_offline_episode_queue');
-    setMessage('Local offline storage & watchlist cache cleared.');
-  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>App Settings & Live Demo Config</Text>
+      <Text style={styles.heading}>Settings</Text>
+      <Text style={styles.subtitle}>Manage your CineCircle account.</Text>
 
       <View style={styles.card}>
-        <Text style={styles.title}>Live Classroom LAN IP Switcher</Text>
-        <TextInput
-          style={styles.input}
-          value={apiUrl}
-          onChangeText={setApiUrl}
-          placeholder="http://192.168.1.X:5000/api"
-          placeholderTextColor={COLORS.textSecondary}
-          autoCapitalize="none"
-        />
-        <TouchableOpacity style={styles.actionBtn} onPress={handleSaveApiUrl}>
-          <Text style={styles.btnText}>Update Backend API URL</Text>
-        </TouchableOpacity>
+        <Text style={styles.eyebrow}>ACCOUNT</Text>
+        <Text style={styles.name}>{user?.name || user?.username || 'CineCircle member'}</Text>
+        <Text style={styles.email}>{user?.email || 'Your account'}</Text>
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.title}>Offline Storage & Sync (@{user?.username})</Text>
-        <TouchableOpacity style={styles.actionBtn} onPress={handleForceSync}>
-          <Text style={styles.btnText}>Force Sync Offline Queue →</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.actionBtn, { borderColor: COLORS.primary }]}
-          onPress={handleClearLocalCache}
-        >
-          <Text style={[styles.btnText, { color: COLORS.primary }]}>Clear AsyncStorage Cache</Text>
-        </TouchableOpacity>
+        <Text style={styles.eyebrow}>ABOUT CINECIRCLE</Text>
+        <Text style={styles.description}>
+          Discover something great, keep your watchlist organized, and share what you love with your circle.
+        </Text>
       </View>
-
-      {message ? <Text style={styles.feedback}>{message}</Text> : null}
 
       <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
-        <Text style={styles.logoutText}>Log Out of Account (v1.0.0)</Text>
+        <Text style={styles.logoutText}>Sign out</Text>
       </TouchableOpacity>
+      <Text style={styles.version}>CineCircle · Version 1.0.0</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background, padding: 16 },
-  heading: { fontSize: 22, fontWeight: 'bold', color: COLORS.textPrimary, marginBottom: 14 },
+  heading: { fontSize: 28, fontWeight: '800', color: COLORS.textPrimary, marginTop: 8 },
+  subtitle: { color: COLORS.textSecondary, fontSize: 14, marginTop: 5, marginBottom: 22 },
   card: {
     backgroundColor: COLORS.surface,
-    padding: 16,
-    borderRadius: 14,
+    padding: 18,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
     marginBottom: 14
   },
-  title: { fontSize: 15, fontWeight: 'bold', color: COLORS.textPrimary, marginBottom: 8 },
-  input: {
-    backgroundColor: COLORS.background,
-    color: COLORS.textPrimary,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.border
-  },
-  actionBtn: {
-    paddingVertical: 11,
-    borderWidth: 1,
-    borderColor: COLORS.accent,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10
-  },
-  btnText: { color: COLORS.accent, fontWeight: '600', fontSize: 13 },
-  feedback: { color: COLORS.success, textAlign: 'center', marginVertical: 8, fontSize: 12 },
+  eyebrow: { color: COLORS.primary, fontSize: 11, fontWeight: '800', letterSpacing: 1.2, marginBottom: 10 },
+  name: { color: COLORS.textPrimary, fontSize: 20, fontWeight: '700' },
+  email: { color: COLORS.textSecondary, fontSize: 14, marginTop: 4 },
+  description: { color: COLORS.textSecondary, fontSize: 14, lineHeight: 21 },
   logoutBtn: {
     backgroundColor: COLORS.primary,
     paddingVertical: 13,
@@ -115,5 +56,6 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     marginBottom: 16
   },
-  logoutText: { color: '#111111', fontWeight: 'bold' }
+  logoutText: { color: '#111111', fontWeight: '800', fontSize: 15 },
+  version: { color: COLORS.textSecondary, textAlign: 'center', fontSize: 12, marginBottom: 4 }
 });

@@ -12,7 +12,7 @@ async function seedUsers(prisma) {
       email: 'krish@nst.edu',
       passwordHash,
       subscribedOTTs: ['Netflix', 'Prime Video'],
-      totalWatchMinutes: 540,
+      totalWatchMinutes: 0,
       genrePreferences: {
         create: [
           { genre: 'Sci-Fi', weightScore: 10 },
@@ -32,7 +32,7 @@ async function seedUsers(prisma) {
       email: 'harsh@nst.edu',
       passwordHash,
       subscribedOTTs: ['Netflix', 'Disney+ Hotstar'],
-      totalWatchMinutes: 420,
+      totalWatchMinutes: 0,
       genrePreferences: {
         create: [
           { genre: 'Sci-Fi', weightScore: 9 },
@@ -52,7 +52,7 @@ async function seedUsers(prisma) {
       email: 'aryan@nst.edu',
       passwordHash,
       subscribedOTTs: ['Prime Video', 'JioCinema'],
-      totalWatchMinutes: 380,
+      totalWatchMinutes: 0,
       genrePreferences: {
         create: [
           { genre: 'Thriller', weightScore: 10 },

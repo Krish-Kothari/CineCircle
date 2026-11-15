@@ -43,13 +43,35 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function register(name, username, email, password) {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiClient.post('/tracker/auth/register', {
+        name,
+        username,
+        email,
+        password
+      });
+      const { user: registeredUser, token } = response.data.data;
+      await saveAuthSession(token, registeredUser);
+      setUser(registeredUser);
+      return true;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Unable to create your CineCircle account');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function logout() {
     await clearAuthSession();
     setUser(null);
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

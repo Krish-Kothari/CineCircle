@@ -1,4 +1,5 @@
 const prisma = require('../../config/prisma');
+const { syncMissingPosters } = require('./poster-sync.service');
 
 const round3 = (n) => Math.round(n * 1000) / 1000;
 
@@ -88,6 +89,8 @@ async function getRecommendations(userId, limit) {
     include: { streamingOptions: { select: { platform: true, region: true } } }
   });
   const byId = new Map(media.map((m) => [m.id, m]));
+  const posterUpdates = await syncMissingPosters(media);
+  const posterById = new Map(posterUpdates.map((result) => [result.item.id, result.posterUrl]));
 
   const items = rows.map((r) => {
     const m = byId.get(r.id);
@@ -100,7 +103,7 @@ async function getRecommendations(userId, limit) {
       runtimeMinutes: r.runtimeMinutes,
       totalEpisodes: r.totalEpisodes,
       genres: r.genres,
-      posterUrl: r.posterUrl,
+      posterUrl: posterById.get(r.id) || r.posterUrl,
       avgRating: r.avgRating,
       streamingOptions: m.streamingOptions,
       platforms: m.streamingOptions.map((s) => s.platform),

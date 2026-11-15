@@ -7,7 +7,7 @@ export default function RewindBanner({ wrapped }) {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>30-Day Monthly Rewind (SQL Wrapped)</Text>
+      <Text style={styles.title}>Your 30-day rewind</Text>
       <View style={styles.metricsGrid}>
         <View style={styles.metricItem}>
           <Text style={styles.value}>{wrapped.overview?.total_monthly_hours || 0}h</Text>

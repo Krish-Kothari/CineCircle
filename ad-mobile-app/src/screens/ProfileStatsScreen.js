@@ -24,7 +24,7 @@ export default function ProfileStatsScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.heading}>Profile & SQL Watch Analytics</Text>
+      <Text style={styles.heading}>Your watch stats</Text>
 
       <View style={styles.profileCard}>
         <Text style={styles.name}>{user?.name} (@{user?.username})</Text>
@@ -62,7 +62,7 @@ export default function ProfileStatsScreen() {
       ))}
 
       <TouchableOpacity style={styles.refreshBtn} onPress={loadStats}>
-        <Text style={styles.refreshBtnText}>Refresh SQL Stats</Text>
+        <Text style={styles.refreshBtnText}>Refresh stats</Text>
       </TouchableOpacity>
     </ScrollView>
   );

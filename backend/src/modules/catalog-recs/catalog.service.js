@@ -1,4 +1,5 @@
 const prisma = require('../../config/prisma');
+const { syncMissingPosters, syncPosterForMediaItem } = require('./poster-sync.service');
 
 const include = {
   streamingOptions: { select: { platform: true, region: true } }
@@ -34,6 +35,7 @@ async function listCatalog({ search, platform, genre, type, page, limit }) {
     })
   ]);
 
+  void syncMissingPosters(items);
   return {
     items: items.map(withPlatforms),
     pagination: {
@@ -47,7 +49,9 @@ async function listCatalog({ search, platform, genre, type, page, limit }) {
 
 async function getMediaById(id) {
   const item = await prisma.mediaItem.findUnique({ where: { id }, include });
-  return item ? withPlatforms(item) : null;
+  if (!item) return null;
+  const poster = await syncPosterForMediaItem(item);
+  return withPlatforms({ ...item, posterUrl: poster.posterUrl });
 }
 
 async function listPlatforms() {
