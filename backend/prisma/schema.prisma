@@ -29,33 +29,33 @@ enum GroupRole {
 // =========================================================================
 
 model User {
-  id                String                @id @default(uuid())
+  id                String   @id @default(uuid())
   name              String
-  username          String                @unique
-  email             String                @unique
+  username          String   @unique
+  email             String   @unique
   passwordHash      String
   subscribedOTTs    String[]
-  totalWatchMinutes Int                   @default(0)
-  createdAt         DateTime              @default(now())
+  totalWatchMinutes Int      @default(0)
+  createdAt         DateTime @default(now())
 
-  genrePreferences  UserGenrePreference[]
-  watchlist         WatchlistEntry[]
-  episodeLogs       EpisodeProgress[]
-  reviews           UserReview[]
-  recLogs           RecommendationLog[]
-  groupMemberships  GroupMember[]
-  addedGroupItems   GroupWatchlistItem[]
-  pollVotes         GroupPollVote[]
+  genrePreferences UserGenrePreference[]
+  watchlist        WatchlistEntry[]
+  episodeLogs      EpisodeProgress[]
+  reviews          UserReview[]
+  recLogs          RecommendationLog[]
+  groupMemberships GroupMember[]
+  addedGroupItems  GroupWatchlistItem[]
+  pollVotes        GroupPollVote[]
 
   @@index([username, email])
 }
 
 model UserGenrePreference {
-  id          String   @id @default(uuid())
+  id          String @id @default(uuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   genre       String
-  weightScore Int      @default(5)
+  weightScore Int    @default(5)
 
   @@unique([userId, genre])
   @@index([genre, weightScore])
@@ -90,54 +90,48 @@ model EpisodeProgress {
   @@index([userId, mediaId])
 }
 
-
-
-
-
-
-
 // =========================================================================
 // MODULE 3: ARYAN (Friend Groups, Shared Watchlists & Group Watch Polls)
 // =========================================================================
 
 model FriendGroup {
-  id          String               @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
-  inviteCode  String               @unique
+  inviteCode  String   @unique
   description String?
-  createdAt   DateTime             @default(now())
+  createdAt   DateTime @default(now())
 
-  members     GroupMember[]
-  sharedList  GroupWatchlistItem[]
+  members    GroupMember[]
+  sharedList GroupWatchlistItem[]
 }
 
 model GroupMember {
-  id        String      @id @default(uuid())
-  groupId   String
-  group     FriendGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role      GroupRole   @default(MEMBER)
-  joinedAt  DateTime    @default(now())
+  id       String      @id @default(uuid())
+  groupId  String
+  group    FriendGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     GroupRole   @default(MEMBER)
+  joinedAt DateTime    @default(now())
 
   @@unique([groupId, userId])
   @@index([userId])
 }
 
 model GroupWatchlistItem {
-  id          String          @id @default(uuid())
-  groupId     String
-  group       FriendGroup     @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  mediaId     String
-  media       MediaItem       @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  addedById   String
-  addedBy     User            @relation(fields: [addedById], references: [id])
-  pitchNote   String?
-  status      String          @default("NOMINATED")
-  voteCount   Int             @default(0)
-  createdAt   DateTime        @default(now())
+  id        String      @id @default(uuid())
+  groupId   String
+  group     FriendGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  mediaId   String
+  media     MediaItem   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  addedById String
+  addedBy   User        @relation(fields: [addedById], references: [id])
+  pitchNote String?
+  status    String      @default("NOMINATED")
+  voteCount Int         @default(0)
+  createdAt DateTime    @default(now())
 
-  votes       GroupPollVote[]
+  votes GroupPollVote[]
 
   @@unique([groupId, mediaId])
   @@index([groupId, status, voteCount])
